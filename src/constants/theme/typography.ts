@@ -1,6 +1,9 @@
 export const Typography = {
   fontFamily: {
     main: "TenorSans-Regular",
+    hero: "BodoniModa-Italic",
+    subHero: "BodoniModa-VariableFont",
+    boldHero: "BodoniModa_9pt-BoldItalic",
   },
   fontSize: {
     display: 40,

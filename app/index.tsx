@@ -1,3 +1,4 @@
+import HeroCarousel from "@/src/components/home/HeroCarousel";
 import AppHeader from "@/src/components/ui/AppHeader";
 import { Colors } from "@/src/constants/theme/colors";
 import { DUMMY_PRODUCTS } from "@/src/data/dummyProducts";
@@ -13,6 +14,8 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <AppHeader />
+        <HeroCarousel />
+
         <HomeProductSection products={DUMMY_PRODUCTS} />
       </ScrollView>
     </SafeAreaView>

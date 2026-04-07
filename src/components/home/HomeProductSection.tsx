@@ -1,6 +1,8 @@
+import { Theme } from "@/src/constants/theme";
 import { Product } from "@/src/types/database";
+import { Feather } from "@expo/vector-icons";
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import ProductCard from "../common/ProductCard";
 import CategoryTabs from "./CategoryTabs";
 
@@ -30,6 +32,14 @@ export default function HomeProductSection({
           </View>
         ))}
       </View>
+      <TouchableOpacity
+        style={styles.moreButton}
+        activeOpacity={0.6}
+        onPress={() => console.log("Explore More 클릭")}
+      >
+        <Text style={styles.moreText}>Explore More</Text>
+        <Feather name="arrow-right" size={16} color={Theme.colors.primary} />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -53,5 +63,19 @@ const styles = StyleSheet.create({
   cardWrapper: {
     width: "48%",
     marginBottom: 16,
+  },
+  moreButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+    paddingVertical: 10,
+    gap: 4,
+  },
+  moreText: {
+    fontFamily: Theme.typography.fontFamily.main,
+    fontSize: Theme.typography.fontSize.sm,
+    color: Theme.colors.primary,
+    letterSpacing: Theme.typography.letterSpacing.wide,
   },
 });

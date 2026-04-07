@@ -12,6 +12,9 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const [loaded] = useFonts({
     "TenorSans-Regular": require("../assets/fonts/TenorSans-Regular.ttf"),
+    "BodoniModa-Italic": require("../assets/fonts/BodoniModa-Italic-VariableFont_opsz,wght.ttf"),
+    "BodoniModa-VariableFont": require("../assets/fonts/BodoniModa-VariableFont_opsz,wght.ttf"),
+    "BodoniModa_9pt-BoldItalic": require("../assets/fonts/BodoniModa_9pt-BoldItalic.ttf.ttf"),
   });
 
   useEffect(() => {

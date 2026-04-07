@@ -1,8 +1,6 @@
-// src/data/dummyProducts.ts
 import { Product } from "@/src/types/database";
 
 export const DUMMY_PRODUCTS: Product[] = [
-  // --- APPAREL (4) ---
   {
     id: "app-1",
     name: "21WN reversible angora cardigan",
@@ -51,8 +49,6 @@ export const DUMMY_PRODUCTS: Product[] = [
     options: { sizes: ["S", "M", "L"], colors: ["Black"] },
     created_at: new Date().toISOString(),
   },
-
-  // --- BAG (4) ---
   {
     id: "bag-1",
     name: "Oblong Leather Bag",
@@ -101,8 +97,6 @@ export const DUMMY_PRODUCTS: Product[] = [
     options: { sizes: ["Free"], colors: ["Cream"] },
     created_at: new Date().toISOString(),
   },
-
-  // --- T-SHIRT (4) ---
   {
     id: "ts-1",
     name: "Essential Heavy Cotton Tee",
@@ -151,8 +145,6 @@ export const DUMMY_PRODUCTS: Product[] = [
     options: { sizes: ["S", "M", "L"], colors: ["White"] },
     created_at: new Date().toISOString(),
   },
-
-  // --- DRESS (4) ---
   {
     id: "dr-1",
     name: "Silk Slip Midi Dress",
