@@ -1,5 +1,6 @@
 import BrandLogoSection from "@/src/components/home/BrandLogoSection";
 import Collections from "@/src/components/home/Collections";
+import ForYou from "@/src/components/home/ForYou";
 import HeroCarousel from "@/src/components/home/HeroCarousel";
 import AppHeader from "@/src/components/ui/AppHeader";
 import { Colors } from "@/src/constants/theme/colors";
@@ -21,6 +22,7 @@ export default function HomeScreen() {
         <HomeProductSection products={DUMMY_PRODUCTS} />
         <BrandLogoSection />
         <Collections />
+        <ForYou />
       </ScrollView>
     </SafeAreaView>
   );
