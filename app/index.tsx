@@ -1,3 +1,5 @@
+import BrandLogoSection from "@/src/components/home/BrandLogoSection";
+import Collections from "@/src/components/home/Collections";
 import HeroCarousel from "@/src/components/home/HeroCarousel";
 import AppHeader from "@/src/components/ui/AppHeader";
 import { Colors } from "@/src/constants/theme/colors";
@@ -17,6 +19,8 @@ export default function HomeScreen() {
         <HeroCarousel />
 
         <HomeProductSection products={DUMMY_PRODUCTS} />
+        <BrandLogoSection />
+        <Collections />
       </ScrollView>
     </SafeAreaView>
   );

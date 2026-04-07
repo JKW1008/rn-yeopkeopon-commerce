@@ -7,14 +7,14 @@ export default function AppHeader() {
       <View style={styles.sideArea}>
         <TouchableOpacity>
           <Image
-            source={Images.menu}
+            source={Images.header.menu}
             style={styles.headerIcons}
             resizeMode="contain"
           ></Image>
         </TouchableOpacity>
       </View>
       <Image
-        source={Images.logo}
+        source={Images.header.logo}
         style={styles.logoImage}
         resizeMode="contain"
       ></Image>
@@ -22,14 +22,14 @@ export default function AppHeader() {
         <View style={styles.rightActions}>
           <TouchableOpacity>
             <Image
-              source={Images.search}
+              source={Images.header.search}
               style={styles.headerIcons}
               resizeMode="contain"
             ></Image>
           </TouchableOpacity>
           <TouchableOpacity>
             <Image
-              source={Images.shoppingBag}
+              source={Images.header.shoppingBag}
               style={styles.headerIcons}
               resizeMode="contain"
             ></Image>

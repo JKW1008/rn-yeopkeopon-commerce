@@ -18,7 +18,7 @@ export default function CategoryTabs({
       <View style={styles.titleContainer}>
         <Text style={styles.titleText}>NEW ARRIVAL</Text>
         <Image
-          source={Images.titleUnderline}
+          source={Images.home.titleUnderline}
           style={{ width: 150, height: 15 }}
           resizeMode="contain"
         />
