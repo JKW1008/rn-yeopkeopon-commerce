@@ -1,5 +1,4 @@
 import { Images } from "@/src/constants/theme/images";
-import React from "react";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function AppHeader() {

@@ -1,16 +1,20 @@
 import AppHeader from "@/src/components/ui/AppHeader";
 import { Colors } from "@/src/constants/theme/colors";
-import { StyleSheet, Text, View } from "react-native";
+import { DUMMY_PRODUCTS } from "@/src/data/dummyProducts";
+import { ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import HomeProductSection from "../src/components/home/HomeProductSection";
 
 export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
-      <AppHeader />
-      <View style={styles.content}>
-        <Text style={styles.title}>Hello, Open Fashion!</Text>
-        <Text style={styles.subtitle}></Text>
-      </View>
+      <ScrollView
+        style={styles.scrollArea}
+        showsVerticalScrollIndicator={false}
+      >
+        <AppHeader />
+        <HomeProductSection products={DUMMY_PRODUCTS} />
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -20,11 +24,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
-  content: {
+  scrollArea: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
   },
   title: {
     fontSize: 28,

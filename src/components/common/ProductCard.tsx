@@ -21,11 +21,9 @@ export default function ProductCard({ product, onPress }: ProductCardProps) {
               ? product.images[0]
               : "https://via.placeholder.com/300x400",
         }}
+        style={styles.image}
       />
       <View style={styles.infoContainer}>
-        <Text style={styles.brandText}>
-          {product.category ? product.category.toUpperCase() : "OPEN FASHION"}
-        </Text>
         <Text style={styles.productName} numberOfLines={2}>
           {product.name ? product.name : "21WN reversible angora cardigan"}
         </Text>
@@ -38,7 +36,6 @@ export default function ProductCard({ product, onPress }: ProductCardProps) {
 const styles = StyleSheet.create({
   cardContainer: {
     width: "100%",
-    marginBottom: 20,
   },
   image: {
     width: "100%",
@@ -46,21 +43,18 @@ const styles = StyleSheet.create({
     backgroundColor: Theme.colors.grey[100],
   },
   infoContainer: {
-    paddingTop: 10,
+    paddingTop: 6,
     alignItems: "center",
   },
-  brandText: {
-    fontSize: Theme.typography.fontSize.xs,
-    color: Theme.colors.grey[500],
-    marginBottom: 4,
-  },
   productName: {
-    fontSize: Theme.typography.fontSize.sm,
+    fontFamily: Theme.typography.fontFamily.main,
+    fontSize: Theme.typography.fontSize.xs,
     color: Theme.colors.primary,
     textAlign: "center",
-    marginBottom: 4,
+    marginBottom: 6,
   },
   price: {
+    fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.md,
     color: Theme.colors.accent,
   },
