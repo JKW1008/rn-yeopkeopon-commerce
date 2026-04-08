@@ -1,6 +1,5 @@
 import BrandLogoSection from "@/src/components/home/BrandLogoSection";
 import BrandStory from "@/src/components/home/BrandStory";
-import CartMenu from "@/src/components/common/CartMenu";
 import Collections from "@/src/components/home/Collections";
 import ForYou from "@/src/components/home/ForYou";
 import HeroCarousel from "@/src/components/home/HeroCarousel";
@@ -11,7 +10,6 @@ import { Colors } from "@/src/constants/theme/colors";
 import { DUMMY_PRODUCTS } from "@/src/data/dummyProducts";
 import { ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ToggleMenu from "@/src/components/common/ToggleMenu";
 import HomeProductSection from "../src/components/home/HomeProductSection";
 
 export default function HomeScreen() {
@@ -32,8 +30,6 @@ export default function HomeScreen() {
         <SnsSection />
         <AppFooter />
       </ScrollView>
-      <ToggleMenu />
-      <CartMenu />
     </SafeAreaView>
   );
 }

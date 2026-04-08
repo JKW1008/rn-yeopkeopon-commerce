@@ -6,6 +6,9 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { View, StyleSheet } from "react-native";
+import ToggleMenu from "@/src/components/common/ToggleMenu";
+import CartMenu from "@/src/components/common/CartMenu";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -28,11 +31,21 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ThemeProvider value={DefaultTheme}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-        </Stack>
-        <StatusBar style="auto" />
+        <View style={styles.root}>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+          </Stack>
+          <StatusBar style="auto" />
+          <ToggleMenu />
+          <CartMenu />
+        </View>
       </ThemeProvider>
     </SafeAreaProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+});

@@ -3,6 +3,7 @@ import { Images } from "@/src/constants/theme/images";
 import { useMenuStore } from "@/src/store/useMenuStore";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import { useState } from "react";
+import { useRouter } from "expo-router";
 import {
   Image,
   Modal,
@@ -68,6 +69,15 @@ export default function ToggleMenu() {
   const [activeTab, setActiveTab] = useState("WOMEN");
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+
+  const handleNavigate = (category: string, subCategory?: string) => {
+    closeMenu();
+    router.push({
+      pathname: "/products",
+      params: { category, subCategory: subCategory ?? "" },
+    });
+  };
 
   const scrollY = useSharedValue(0);
   const contentHeight = useSharedValue(1);
@@ -176,6 +186,7 @@ export default function ToggleMenu() {
               <Animated.View
                 key={cat.id}
                 layout={LinearTransition}
+                collapsable={false}
                 style={styles.animatedRow}
               >
                 <TouchableOpacity
@@ -200,7 +211,11 @@ export default function ToggleMenu() {
                 {expandedCategory === cat.id && (
                   <Animated.View style={styles.subCategoryContainer}>
                     {cat.subCategories.map((sub, idx) => (
-                      <TouchableOpacity key={idx} style={styles.subCategoryRow}>
+                      <TouchableOpacity
+                        key={idx}
+                        style={styles.subCategoryRow}
+                        onPress={() => handleNavigate(cat.name, sub)}
+                      >
                         <Text style={styles.subCategoryText}>{sub}</Text>
                       </TouchableOpacity>
                     ))}
@@ -358,7 +373,6 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   animatedRow: {
-    overflow: "hidden",
   },
   categoryRow: {
     paddingVertical: 20,
