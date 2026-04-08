@@ -27,6 +27,13 @@ export const Images = {
       3: require("@/assets/images/home/stickers/sticker3.png"),
       4: require("@/assets/images/home/stickers/sticker4.png"),
       penLine: require("@/assets/images/home/stickers/penLine.png"),
+      lineInstagram: require("@/assets/images/home/stickers/lineInstargram.png"),
+    },
+    profile: {
+      mia1: require("@/assets/images/home/profile/mia1.png"),
+      mia2: require("@/assets/images/home/profile/mia2.png"),
+      jihyn1: require("@/assets/images/home/profile/jihyn1.png"),
+      jihyn2: require("@/assets/images/home/profile/jihyn2.png"),
     },
   },
 } as const;

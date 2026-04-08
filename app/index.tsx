@@ -3,6 +3,7 @@ import BrandStory from "@/src/components/home/BrandStory";
 import Collections from "@/src/components/home/Collections";
 import ForYou from "@/src/components/home/ForYou";
 import HeroCarousel from "@/src/components/home/HeroCarousel";
+import SnsSection from "@/src/components/home/SnsSection";
 import AppHeader from "@/src/components/ui/AppHeader";
 import { Colors } from "@/src/constants/theme/colors";
 import { DUMMY_PRODUCTS } from "@/src/data/dummyProducts";
@@ -19,12 +20,12 @@ export default function HomeScreen() {
       >
         <AppHeader />
         <HeroCarousel />
-
         <HomeProductSection products={DUMMY_PRODUCTS} />
         <BrandLogoSection />
         <Collections />
         <ForYou />
         <BrandStory />
+        <SnsSection />
       </ScrollView>
     </SafeAreaView>
   );
