@@ -1,5 +1,6 @@
 import BrandLogoSection from "@/src/components/home/BrandLogoSection";
 import BrandStory from "@/src/components/home/BrandStory";
+import CartMenu from "@/src/components/common/CartMenu";
 import Collections from "@/src/components/home/Collections";
 import ForYou from "@/src/components/home/ForYou";
 import HeroCarousel from "@/src/components/home/HeroCarousel";
@@ -14,6 +15,7 @@ import ToggleMenu from "@/src/components/common/ToggleMenu";
 import HomeProductSection from "../src/components/home/HomeProductSection";
 
 export default function HomeScreen() {
+
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <ScrollView
@@ -31,6 +33,7 @@ export default function HomeScreen() {
         <AppFooter />
       </ScrollView>
       <ToggleMenu />
+      <CartMenu />
     </SafeAreaView>
   );
 }

@@ -1,9 +1,11 @@
 import { Images } from "@/src/constants/theme/images";
 import { useMenuStore } from "@/src/store/useMenuStore";
+import { useCartStore } from "@/src/store/useCartStore";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function AppHeader() {
   const openMenu = useMenuStore((state) => state.openMenu);
+  const openCart = useCartStore((state) => state.openCart);
 
   return (
     <View style={styles.container}>
@@ -30,7 +32,7 @@ export default function AppHeader() {
               resizeMode="contain"
             ></Image>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={openCart}>
             <Image
               source={Images.header.shoppingBag}
               style={styles.headerIcons}
