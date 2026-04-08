@@ -1,4 +1,5 @@
 import BrandLogoSection from "@/src/components/home/BrandLogoSection";
+import BrandStory from "@/src/components/home/BrandStory";
 import Collections from "@/src/components/home/Collections";
 import ForYou from "@/src/components/home/ForYou";
 import HeroCarousel from "@/src/components/home/HeroCarousel";
@@ -23,6 +24,7 @@ export default function HomeScreen() {
         <BrandLogoSection />
         <Collections />
         <ForYou />
+        <BrandStory />
       </ScrollView>
     </SafeAreaView>
   );

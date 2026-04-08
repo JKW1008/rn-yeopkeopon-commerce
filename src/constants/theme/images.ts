@@ -21,5 +21,12 @@ export const Images = {
       2: require("@/assets/images/home/collections/homeCollection2.png"),
       video: require("@/assets/images/home/collections/video.png"),
     },
+    stickers: {
+      1: require("@/assets/images/home/stickers/sticker1.png"),
+      2: require("@/assets/images/home/stickers/sticker2.png"),
+      3: require("@/assets/images/home/stickers/sticker3.png"),
+      4: require("@/assets/images/home/stickers/sticker4.png"),
+      penLine: require("@/assets/images/home/stickers/penLine.png"),
+    },
   },
 } as const;
