@@ -1,8 +1,7 @@
 import { Theme } from "@/src/constants/theme";
 import { DUMMY_BLOG_POSTS } from "@/src/data/dummyBlogData";
-import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   Image,
   ScrollView,
@@ -11,75 +10,138 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  FlatList,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import BlogCard from "@/src/components/blog/BlogCard";
+import AppHeader from "@/src/components/ui/AppHeader";
+import AppFooter from "@/src/components/ui/AppFooter";
 
 const { width } = Dimensions.get("window");
 
 export default function BlogDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-  const post = DUMMY_BLOG_POSTS.find((p) => p.id === id);
+  const blogId = Array.isArray(id) ? id[0] : id;
+  const post = DUMMY_BLOG_POSTS.find((p) => p.id === blogId);
 
   if (!post) {
     return (
-      <View style={styles.errorContainer}>
+      <SafeAreaView style={styles.errorContainer}>
         <Text style={styles.errorText}>{`Post not found`}</Text>
         <TouchableOpacity onPress={() => router.back()}>
           <Text style={styles.backLink}>{`Go Back`}</Text>
         </TouchableOpacity>
-      </View>
+      </SafeAreaView>
     );
   }
 
-  const relatedPosts = DUMMY_BLOG_POSTS.filter(
-    (p) => p.category === post.category && p.id !== post.id
-  ).slice(0, 3);
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const slideSize = event.nativeEvent.layoutMeasurement.width;
+    const index = event.nativeEvent.contentOffset.x / slideSize;
+    setActiveImageIndex(Math.round(index));
+  };
+
+  const renderRichText = (text: string) => {
+    const highlights = ["Saint Laurent canvas handbag", "Fendi bucket bag", "DeMellier off white bag"];
+    let parts = [text];
+
+    highlights.forEach(highlight => {
+      let nextParts: string[] = [];
+      parts.forEach(part => {
+        if (typeof part === "string") {
+          const splitPart = part.split(highlight);
+          for (let i = 0; i < splitPart.length; i++) {
+            nextParts.push(splitPart[i]);
+            if (i < splitPart.length - 1) {
+              // @ts-ignore
+              nextParts.push(<Text key={`${highlight}-${i}`} style={styles.highlight}>{highlight}</Text>);
+            }
+          }
+        } else {
+          nextParts.push(part);
+        }
+      });
+      // @ts-ignore
+      parts = nextParts;
+    });
+
+    return parts;
+  };
 
   return (
-    <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
-        <View style={styles.heroContainer}>
-          <Image source={{ uri: post.imageUrl }} style={styles.heroImage} />
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <Ionicons name="chevron-back" size={24} color="#fff" />
-          </TouchableOpacity>
-        </View>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+      <AppHeader showBack={true} />
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        <View style={styles.articleBody}>
+          <Image source={{ uri: post.imageUrl }} style={styles.mainImage} />
+          
+          <View style={styles.contentSection}>
+            <Text style={styles.title}>{post.title.toUpperCase()}</Text>
+            
+            {post.sections.map((section, index) => {
+              if (section.type === "image") {
+                if (section.images && section.images.length > 1) {
+                  return (
+                    <View key={`carousel-${index}`} style={styles.carouselContainer}>
+                      <FlatList
+                        data={section.images}
+                        horizontal
+                        pagingEnabled
+                        showsHorizontalScrollIndicator={false}
+                        onScroll={handleScroll}
+                        keyExtractor={(_, i) => `img-${i}`}
+                        renderItem={({ item }) => (
+                          <Image source={{ uri: item }} style={styles.carouselItem} />
+                        )}
+                      />
+                      <View style={styles.pagination}>
+                        {section.images.map((_, i) => (
+                          <View 
+                            key={i} 
+                            style={[
+                              styles.dot, 
+                              activeImageIndex === i && styles.activeDot
+                            ]} 
+                          />
+                        ))}
+                      </View>
+                    </View>
+                  );
+                }
+                return (
+                  <Image 
+                    key={`img-${index}`} 
+                    source={{ uri: section.value }} 
+                    style={styles.sectionImage} 
+                  />
+                );
+              }
+              return (
+                <Text key={`txt-${index}`} style={styles.sectionText}>
+                  {renderRichText(section.value)}
+                </Text>
+              );
+            })}
 
-        <View style={styles.contentContainer}>
-          <View style={styles.metaRow}>
-            <Text style={styles.category}>{`${post.category}`}</Text>
-            <Text style={styles.date}>{`${post.updatedAt}`}</Text>
-          </View>
-
-          <Text style={styles.title}>{`${post.title}`}</Text>
-
-          <View style={styles.tagsContainer}>
-            {post.tags.map((tag, index) => (
-              <Text key={index} style={styles.tag}>{`${tag}`}</Text>
-            ))}
-          </View>
-
-          <View style={styles.divider} />
-
-          <Text style={styles.content}>{`${post.content}`}</Text>
-
-          {relatedPosts.length > 0 && (
-            <View style={styles.relatedSection}>
-              <Text style={styles.relatedTitle}>{`RELATED POSTS`}</Text>
-              {relatedPosts.map((item) => (
-                <BlogCard key={item.id} post={item} viewMode="small" />
-              ))}
+            <View style={styles.articleFooter}>
+              <Text style={styles.postedBy}>{`Posted by OpenFashion | ${post.updatedAt}`}</Text>
+              <View style={styles.footerTags}>
+                {post.tags.map((tag, index) => (
+                  <View key={index} style={styles.tagPill}>
+                    <Text style={styles.footerTag}>{tag}</Text>
+                  </View>
+                ))}
+              </View>
             </View>
-          )}
+          </View>
         </View>
+        <AppFooter />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -88,96 +150,99 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  heroContainer: {
+  scrollContent: {
+    flexGrow: 1,
+  },
+  articleBody: {
+    paddingBottom: 20,
+  },
+  mainImage: {
     width: width,
     height: 450,
-    position: "relative",
-  },
-  heroImage: {
-    width: "100%",
-    height: "100%",
     resizeMode: "cover",
   },
-  backButton: {
-    position: "absolute",
-    top: 60,
-    left: 20,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "rgba(0,0,0,0.3)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  contentContainer: {
-    padding: 24,
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    marginTop: -32,
-  },
-  metaRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  category: {
-    fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 14,
-    color: Theme.colors.primary,
-    fontWeight: "700",
-    letterSpacing: 1,
-  },
-  date: {
-    fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 13,
-    color: Theme.colors.grey[400],
+  contentSection: {
+    padding: 20,
   },
   title: {
-    fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 26,
-    color: Theme.colors.primary,
-    fontWeight: "700",
-    lineHeight: 34,
-    marginBottom: 16,
-  },
-  tagsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginBottom: 24,
-  },
-  tag: {
-    fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 13,
-    color: Theme.colors.secondary,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: Theme.colors.grey[100],
-    marginBottom: 24,
-  },
-  content: {
-    fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 16,
-    color: Theme.colors.primary,
-    lineHeight: 28,
-    marginBottom: 20,
-  },
-  relatedSection: {
-    marginTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: Theme.colors.grey[100],
-    paddingTop: 30,
-  },
-  relatedTitle: {
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: 18,
     color: Theme.colors.primary,
     fontWeight: "700",
-    letterSpacing: 2,
-    marginBottom: 25,
+    lineHeight: 28,
+    marginBottom: 24,
+    letterSpacing: 1,
+  },
+  sectionText: {
+    fontFamily: Theme.typography.fontFamily.main,
+    fontSize: 16,
+    color: Theme.colors.primary,
+    lineHeight: 26,
+    marginBottom: 30,
+  },
+  highlight: {
+    color: "#DD8560", // Screenshot highlight color
+    fontWeight: "600",
+  },
+  sectionImage: {
+    width: width - 40,
+    height: 480,
+    marginBottom: 20,
+    resizeMode: "cover",
+  },
+  carouselContainer: {
+    marginBottom: 30,
+  },
+  carouselItem: {
+    width: width - 40,
+    height: 480,
+    resizeMode: "cover",
+  },
+  pagination: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 12,
+    gap: 8,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderWidth: 1,
+    borderColor: "#888",
+    transform: [{ rotate: "45deg" }],
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    backgroundColor: "#888",
+  },
+  articleFooter: {
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  postedBy: {
+    fontFamily: Theme.typography.fontFamily.main,
+    fontSize: 14,
+    color: Theme.colors.primary,
+    marginBottom: 16,
+  },
+  footerTags: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+  },
+  tagPill: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#F0F0F0",
+    backgroundColor: "#fff",
+  },
+  footerTag: {
+    fontFamily: Theme.typography.fontFamily.main,
+    fontSize: 14,
+    color: Theme.colors.secondary,
   },
   errorContainer: {
     flex: 1,

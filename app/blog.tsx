@@ -12,7 +12,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import BlogCard from "@/src/components/blog/BlogCard";
 import CategoryFilter from "@/src/components/blog/CategoryFilter";
 import LayoutSwitcher from "@/src/components/blog/LayoutSwitcher";
-import CartMenu from "@/src/components/common/CartMenu";
 import AppFooter from "@/src/components/ui/AppFooter";
 import AppHeader from "@/src/components/ui/AppHeader";
 import { Theme } from "@/src/constants/theme";
@@ -21,18 +20,19 @@ import { BLOG_CATEGORIES, DUMMY_BLOG_POSTS } from "@/src/data/dummyBlogData";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function BlogScreen() {
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>("All");
   const [viewMode, setViewMode] = useState<"large" | "small">("large");
   const [visibleCount, setVisibleCount] = useState(3);
 
-  const allFilteredPosts = activeCategory
-    ? DUMMY_BLOG_POSTS.filter((post) => post.category === activeCategory)
-    : DUMMY_BLOG_POSTS;
+  const allFilteredPosts =
+    activeCategory === "All" || !activeCategory
+      ? DUMMY_BLOG_POSTS
+      : DUMMY_BLOG_POSTS.filter((post) => post.category === activeCategory);
 
   const displayedPosts = allFilteredPosts.slice(0, visibleCount);
 
-  const handleSelectCategory = (cat: string | null) => {
-    setActiveCategory(activeCategory === cat ? null : cat);
+  const handleSelectCategory = (cat: string) => {
+    setActiveCategory(cat);
     setVisibleCount(3);
   };
 
@@ -94,7 +94,6 @@ export default function BlogScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       />
-      <CartMenu />
     </SafeAreaView>
   );
 }

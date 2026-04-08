@@ -10,8 +10,8 @@ import {
 
 interface CategoryFilterProps {
   categories: string[];
-  activeCategory: string | null;
-  onSelectCategory: (category: string | null) => void;
+  activeCategory: string;
+  onSelectCategory: (category: string) => void;
 }
 
 export default function CategoryFilter({
@@ -23,6 +23,7 @@ export default function CategoryFilter({
     <View style={styles.container}>
       <ScrollView
         horizontal
+        nestedScrollEnabled={true}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
