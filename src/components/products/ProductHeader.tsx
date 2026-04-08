@@ -7,9 +7,10 @@ interface ProductHeaderProps {
   count: number;
   onViewChange: () => void;
   viewMode: "grid" | "list" | "large";
+  activeChips?: string[];
 }
 
-export default function ProductHeader({ count, onViewChange, viewMode }: ProductHeaderProps) {
+export default function ProductHeader({ count, onViewChange, viewMode, activeChips = [] }: ProductHeaderProps) {
   const getViewIcon = () => {
     switch (viewMode) {
       case "grid": return "grid-outline";
@@ -40,19 +41,30 @@ export default function ProductHeader({ count, onViewChange, viewMode }: Product
         </View>
       </View>
 
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.chipsContainer}
       >
-        <TouchableOpacity style={styles.chip}>
-          <Text style={styles.chipText}>{`Women`}</Text>
-          <Ionicons name="close" size={16} color={Theme.colors.grey[500]} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.chip}>
-          <Text style={styles.chipText}>{`All apparel`}</Text>
-          <Ionicons name="close" size={16} color={Theme.colors.grey[500]} />
-        </TouchableOpacity>
+        {activeChips.length > 0 ? (
+          activeChips.map((chip, index) => (
+            <View key={index} style={styles.chip}>
+              <Text style={styles.chipText}>{chip}</Text>
+              <Ionicons name="close" size={16} color={Theme.colors.grey[500]} />
+            </View>
+          ))
+        ) : (
+          <>
+            <View style={styles.chip}>
+              <Text style={styles.chipText}>{`Women`}</Text>
+              <Ionicons name="close" size={16} color={Theme.colors.grey[500]} />
+            </View>
+            <View style={styles.chip}>
+              <Text style={styles.chipText}>{`All apparel`}</Text>
+              <Ionicons name="close" size={16} color={Theme.colors.grey[500]} />
+            </View>
+          </>
+        )}
       </ScrollView>
     </View>
   );

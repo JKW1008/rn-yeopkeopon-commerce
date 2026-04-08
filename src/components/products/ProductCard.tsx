@@ -1,8 +1,8 @@
 import { Theme } from "@/src/constants/theme";
 import { Product } from "@/src/data/dummyProductData";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 
 interface ProductCardProps {
   product: Product;
@@ -18,7 +18,7 @@ export default function ProductCard({ product, variant }: ProductCardProps) {
           <Text style={styles.brandText}>{product.brand}</Text>
           <Text style={styles.nameText}>{product.name}</Text>
           <Text style={styles.priceText}>{`$${product.price}`}</Text>
-          
+
           <View style={styles.ratingRow}>
             <Ionicons name="star" size={14} color="#DD8560" />
             <Text style={styles.ratingText}>{`${product.rating} Ratings`}</Text>
@@ -33,11 +33,11 @@ export default function ProductCard({ product, variant }: ProductCardProps) {
                 </View>
               ))}
             </View>
+            <TouchableOpacity style={styles.heartButton}>
+              <Ionicons name="heart-outline" size={22} color="#DD8560" />
+            </TouchableOpacity>
           </View>
         </View>
-        <TouchableOpacity style={styles.heartButton}>
-          <Ionicons name="heart-outline" size={24} color="#DD8560" />
-        </TouchableOpacity>
       </TouchableOpacity>
     );
   }
@@ -63,7 +63,9 @@ export default function ProductCard({ product, variant }: ProductCardProps) {
       <Image source={{ uri: product.imageUrl }} style={styles.gridImage} />
       <View style={styles.gridFooter}>
         <Text style={styles.brandText}>{product.brand}</Text>
-        <Text style={styles.nameText} numberOfLines={2}>{product.name}</Text>
+        <Text style={styles.nameText} numberOfLines={2}>
+          {product.name}
+        </Text>
         <Text style={styles.priceText}>{`$${product.price}`}</Text>
       </View>
     </TouchableOpacity>
@@ -74,9 +76,10 @@ const styles = StyleSheet.create({
   // Common Styles
   brandText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 14,
+    fontSize: 17,
     color: "#333",
     fontWeight: "600",
+    letterSpacing: 1.5,
     marginBottom: 4,
   },
   nameText: {
@@ -128,20 +131,24 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    marginVertical: 4,
+    marginTop: 14,
+    marginBottom: 4,
   },
   ratingText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 12,
+    fontSize: 14,
     color: Theme.colors.grey[500],
   },
   sizeSection: {
-    marginTop: 8,
+    marginTop: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
   },
   sizeTitle: {
-    fontSize: 12,
-    color: Theme.colors.grey[400],
-    marginBottom: 6,
+    fontSize: 14,
+    color: Theme.colors.grey[500],
+    fontFamily: Theme.typography.fontFamily.main,
   },
   sizeRow: {
     flexDirection: "row",

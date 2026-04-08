@@ -1,14 +1,24 @@
 import { DUMMY_PRODUCTS } from "@/src/data/dummyProductData";
 import React, { useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useLocalSearchParams } from "expo-router";
 import AppHeader from "@/src/components/ui/AppHeader";
 import AppFooter from "@/src/components/ui/AppFooter";
 import ProductHeader from "@/src/components/products/ProductHeader";
 import ProductCard from "@/src/components/products/ProductCard";
 
 export default function ProductsScreen() {
+  const { category, subCategory } = useLocalSearchParams<{
+    category?: string;
+    subCategory?: string;
+  }>();
+
   const [viewMode, setViewMode] = useState<"grid" | "list" | "large">("grid");
+
+  const activeChips: string[] = [];
+  if (category) activeChips.push(category);
+  if (subCategory) activeChips.push(subCategory);
 
   const toggleViewMode = () => {
     if (viewMode === "grid") setViewMode("list");
@@ -22,7 +32,7 @@ export default function ProductsScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
-      <AppHeader />
+      <AppHeader showBack={true} />
       <FlatList
         key={viewMode === "grid" ? "grid-view" : "other-view"}
         data={DUMMY_PRODUCTS}
@@ -32,10 +42,11 @@ export default function ProductsScreen() {
         contentContainerStyle={styles.listContent}
         columnWrapperStyle={viewMode === "grid" ? styles.columnWrapper : null}
         ListHeaderComponent={
-          <ProductHeader 
-            count={4500} 
-            viewMode={viewMode} 
-            onViewChange={toggleViewMode} 
+          <ProductHeader
+            count={DUMMY_PRODUCTS.length}
+            viewMode={viewMode}
+            onViewChange={toggleViewMode}
+            activeChips={activeChips}
           />
         }
         ListFooterComponent={<AppFooter />}
@@ -58,3 +69,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
 });
+
