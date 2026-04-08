@@ -1,7 +1,7 @@
 import { Theme } from "@/src/constants/theme";
 import { Product } from "@/src/data/dummyProductData";
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface ProductCardProps {
@@ -10,14 +10,20 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, variant }: ProductCardProps) {
+  const [isLiked, setIsLiked] = useState(false);
+
+  const handleToggleLike = () => {
+    setIsLiked(!isLiked);
+  };
+
   if (variant === "list") {
     return (
       <TouchableOpacity style={styles.listContainer}>
         <Image source={{ uri: product.imageUrl }} style={styles.listImage} />
         <View style={styles.listInfo}>
           <Text style={styles.brandText}>{product.brand}</Text>
-          <Text style={styles.nameText}>{product.name}</Text>
-          <Text style={styles.priceText}>{`$${product.price}`}</Text>
+          <Text style={[styles.nameText, styles.listNameText]}>{product.name}</Text>
+          <Text style={styles.listPriceText}>{`$${product.price}`}</Text>
 
           <View style={styles.ratingRow}>
             <Ionicons name="star" size={14} color="#DD8560" />
@@ -33,8 +39,12 @@ export default function ProductCard({ product, variant }: ProductCardProps) {
                 </View>
               ))}
             </View>
-            <TouchableOpacity style={styles.heartButton}>
-              <Ionicons name="heart-outline" size={22} color="#DD8560" />
+            <TouchableOpacity style={styles.heartButton} onPress={handleToggleLike}>
+              <Ionicons
+                name={isLiked ? "heart" : "heart-outline"}
+                size={22}
+                color={isLiked ? "#DD8560" : "#DD8560"}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -95,6 +105,18 @@ const styles = StyleSheet.create({
     color: "#DD8560",
     fontWeight: "700",
   },
+  listNameText: {
+    fontSize: 18,
+    color: Theme.colors.primary,
+    marginBottom: 8,
+  },
+  listPriceText: {
+    fontFamily: Theme.typography.fontFamily.main,
+    fontSize: 18,
+    color: "#DD8560",
+    fontWeight: "700",
+    marginTop: 12,
+  },
 
   // Grid Styles
   gridContainer: {
@@ -137,7 +159,7 @@ const styles = StyleSheet.create({
   ratingText: {
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: 14,
-    color: Theme.colors.grey[500],
+    color: Theme.colors.secondary,
   },
   sizeSection: {
     marginTop: 10,
@@ -147,7 +169,7 @@ const styles = StyleSheet.create({
   },
   sizeTitle: {
     fontSize: 14,
-    color: Theme.colors.grey[500],
+    color: Theme.colors.secondary,
     fontFamily: Theme.typography.fontFamily.main,
   },
   sizeRow: {
