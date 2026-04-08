@@ -10,6 +10,10 @@ export const Images = {
     twitter: require("@/assets/images/footer/twitter.png"),
     youtube: require("@/assets/images/footer/youtube.png"),
   },
+  tabMenu: {
+    call: require("@/assets/images/tabMenu/call.png"),
+    location: require("@/assets/images/tabMenu/location.png"),
+  },
 
   home: {
     titleUnderline: require("@/assets/images/titleUnderline.png"),

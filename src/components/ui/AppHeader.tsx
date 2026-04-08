@@ -1,16 +1,19 @@
 import { Images } from "@/src/constants/theme/images";
+import { useMenuStore } from "@/src/store/useMenuStore";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function AppHeader() {
+  const openMenu = useMenuStore((state) => state.openMenu);
+
   return (
     <View style={styles.container}>
       <View style={styles.sideArea}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={openMenu}>
           <Image
             source={Images.header.menu}
             style={styles.headerIcons}
             resizeMode="contain"
-          ></Image>
+          />
         </TouchableOpacity>
       </View>
       <Image

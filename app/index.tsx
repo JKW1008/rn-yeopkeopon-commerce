@@ -10,6 +10,7 @@ import { Colors } from "@/src/constants/theme/colors";
 import { DUMMY_PRODUCTS } from "@/src/data/dummyProducts";
 import { ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ToggleMenu from "@/src/components/common/ToggleMenu";
 import HomeProductSection from "../src/components/home/HomeProductSection";
 
 export default function HomeScreen() {
@@ -29,6 +30,7 @@ export default function HomeScreen() {
         <SnsSection />
         <AppFooter />
       </ScrollView>
+      <ToggleMenu />
     </SafeAreaView>
   );
 }
