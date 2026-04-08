@@ -1,8 +1,10 @@
 import { Theme } from "@/src/constants/theme";
 import { Images } from "@/src/constants/theme/images";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useRouter } from "expo-router";
 
 export default function AppFooter() {
+  const router = useRouter();
   return (
     <View style={styles.container}>
       <View style={styles.socialContainer}>
@@ -54,7 +56,7 @@ export default function AppFooter() {
         <TouchableOpacity>
           <Text style={styles.linkText}>Contact</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/blog")}>
           <Text style={styles.linkText}>Blog</Text>
         </TouchableOpacity>
       </View>
