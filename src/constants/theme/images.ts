@@ -1,9 +1,14 @@
 export const Images = {
   header: {
-    menu: require("@/assets/images/menu.png"),
+    menu: require("@/assets/images/header/menu.png"),
     logo: require("@/assets/images/logo.png"),
-    search: require("@/assets/images/search.png"),
-    shoppingBag: require("@/assets/images/shoppingBag.png"),
+    search: require("@/assets/images/header/search.png"),
+    shoppingBag: require("@/assets/images/header/shoppingBag.png"),
+  },
+  footer: {
+    instagram: require("@/assets/images/footer/instagram.png"),
+    twitter: require("@/assets/images/footer/twitter.png"),
+    youtube: require("@/assets/images/footer/youtube.png"),
   },
 
   home: {

@@ -4,6 +4,7 @@ import Collections from "@/src/components/home/Collections";
 import ForYou from "@/src/components/home/ForYou";
 import HeroCarousel from "@/src/components/home/HeroCarousel";
 import SnsSection from "@/src/components/home/SnsSection";
+import AppFooter from "@/src/components/ui/AppFooter";
 import AppHeader from "@/src/components/ui/AppHeader";
 import { Colors } from "@/src/constants/theme/colors";
 import { DUMMY_PRODUCTS } from "@/src/data/dummyProducts";
@@ -13,7 +14,7 @@ import HomeProductSection from "../src/components/home/HomeProductSection";
 
 export default function HomeScreen() {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <ScrollView
         style={styles.scrollArea}
         showsVerticalScrollIndicator={false}
@@ -26,6 +27,7 @@ export default function HomeScreen() {
         <ForYou />
         <BrandStory />
         <SnsSection />
+        <AppFooter />
       </ScrollView>
     </SafeAreaView>
   );
