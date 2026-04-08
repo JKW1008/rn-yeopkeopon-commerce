@@ -1,11 +1,14 @@
 import { Theme } from "@/src/constants/theme";
 import { BlogPost } from "@/src/data/dummyBlogData";
+import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import { Image, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 
 interface BlogCardProps {
   post: BlogPost;
+  viewMode?: "large" | "small";
 }
 
 function getRelativeDate(dateString: string) {
@@ -28,11 +31,74 @@ function getRelativeDate(dateString: string) {
   return `${diffYears} ${diffYears === 1 ? "year" : "years"} ago`;
 }
 
-export default function BlogCard({ post }: BlogCardProps) {
+export default function BlogCard({ post, viewMode = "large" }: BlogCardProps) {
+  const router = useRouter();
+  const [isSaved, setIsSaved] = useState(false);
+
+  const handlePress = () => {
+    router.push(`/blog/${post.id}`);
+  };
+
+  const renderTags = (limit: number) => (
+    <View style={styles.tagsWrapper}>
+      {post.tags.slice(0, limit).map((tag, index) => (
+        <View key={index} style={styles.tagBadge}>
+          <Text style={styles.tagText}>{`${tag}`}</Text>
+        </View>
+      ))}
+    </View>
+  );
+
+  const BookmarkButton = () => (
+    <TouchableOpacity
+      style={styles.bookmarkButton}
+      onPress={(e) => {
+        e.stopPropagation();
+        setIsSaved(!isSaved);
+      }}
+      activeOpacity={0.7}
+    >
+      <View style={styles.bookmarkBlur}>
+        <Ionicons
+          name={isSaved ? "bookmark" : "bookmark-outline"}
+          size={20}
+          color={isSaved ? Theme.colors.primary : "#fff"}
+        />
+      </View>
+    </TouchableOpacity>
+  );
+
+  if (viewMode === "small") {
+    return (
+      <TouchableOpacity
+        style={styles.smallContainer}
+        onPress={handlePress}
+        activeOpacity={0.9}
+      >
+        <View style={styles.smallImageWrapper}>
+          <Image source={{ uri: post.imageUrl }} style={styles.image} />
+          <BookmarkButton />
+        </View>
+        <View style={styles.smallContent}>
+          <Text style={styles.smallTitle} numberOfLines={2}>{`${post.title}`}</Text>
+          <Text style={styles.smallDesc} numberOfLines={3}>{`${post.description}`}</Text>
+          <View style={styles.smallMeta}>
+            <Text style={styles.dateText}>{`${getRelativeDate(post.updatedAt)}`}</Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  }
+
   return (
-    <View style={styles.container}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={handlePress}
+      activeOpacity={0.9}
+    >
       <View style={styles.imageWrapper}>
         <Image source={{ uri: post.imageUrl }} style={styles.image} />
+        <BookmarkButton />
         <LinearGradient
           colors={["transparent", "rgba(0,0,0,0.9)"]}
           style={styles.gradient}
@@ -42,20 +108,10 @@ export default function BlogCard({ post }: BlogCardProps) {
       </View>
 
       <View style={styles.metaContainer}>
-        <View style={styles.tagsWrapper}>
-          {post.tags
-            .slice(0, post.tags.join("").length > 15 ? 2 : 3)
-            .map((tag, index) => (
-              <View key={index} style={styles.tagBadge}>
-                <Text style={styles.tagText}>{`${tag}`}</Text>
-              </View>
-            ))}
-        </View>
-        <Text
-          style={styles.dateText}
-        >{`${getRelativeDate(post.updatedAt)}`}</Text>
+        {renderTags(post.tags.join("").length > 15 ? 2 : 3)}
+        <Text style={styles.dateText}>{`${getRelativeDate(post.updatedAt)}`}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -67,14 +123,25 @@ const styles = StyleSheet.create({
   imageWrapper: {
     width: "100%",
     height: 220,
-    // borderRadius: 12,
     overflow: "hidden",
     backgroundColor: Theme.colors.grey[100],
+    position: "relative",
   },
   image: {
     width: "100%",
     height: "100%",
     resizeMode: "cover",
+  },
+  bookmarkButton: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    zIndex: 10,
+  },
+  bookmarkBlur: {
+    padding: 4,
+    alignItems: "center",
+    justifyContent: "center",
   },
   gradient: {
     position: "absolute",
@@ -102,8 +169,6 @@ const styles = StyleSheet.create({
   tagsWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    flex: 1,
-    marginRight: 15,
     gap: 8,
   },
   tagBadge: {
@@ -115,18 +180,51 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 13,
+    fontSize: 12,
     color: Theme.colors.secondary,
     letterSpacing: 0.5,
   },
-  ellipsis: {
-    color: Theme.colors.grey[400],
-    fontSize: 16,
-    marginLeft: -4,
-  },
   dateText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 13,
+    fontSize: 12,
     color: Theme.colors.grey[400],
+  },
+  smallContainer: {
+    flexDirection: "row",
+    marginBottom: 25,
+    paddingHorizontal: 20,
+    alignItems: "center",
+  },
+  smallImageWrapper: {
+    width: 120,
+    height: 160,
+    overflow: "hidden",
+    backgroundColor: Theme.colors.grey[100],
+    position: "relative",
+  },
+  smallContent: {
+    flex: 1,
+    marginLeft: 15,
+    justifyContent: "center",
+  },
+  smallTitle: {
+    fontFamily: Theme.typography.fontFamily.main,
+    fontSize: 16,
+    color: Theme.colors.primary,
+    fontWeight: "600",
+    marginBottom: 6,
+    lineHeight: 20,
+  },
+  smallDesc: {
+    fontFamily: Theme.typography.fontFamily.main,
+    fontSize: 13,
+    color: Theme.colors.grey[500],
+    marginBottom: 10,
+    lineHeight: 18,
+  },
+  smallMeta: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 });
