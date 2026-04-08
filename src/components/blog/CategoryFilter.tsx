@@ -48,11 +48,11 @@ export default function CategoryFilter({
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 20,
     backgroundColor: "#fff",
   },
   scrollContent: {
-    paddingHorizontal: 20,
+    paddingLeft: 12,
+    paddingRight: 20,
     gap: 12,
   },
   categoryBtn: {
