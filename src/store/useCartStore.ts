@@ -34,12 +34,17 @@ export const useCartStore = create<CartState>((set, get) => ({
   addItem: (item) =>
     set((state) => {
       const existingItem = state.items.find(
-        (i) => i.id === item.id && i.selectedSize === item.selectedSize && i.selectedColor === item.selectedColor
+        (i) =>
+          i.id === item.id &&
+          (i.selectedSize || "") === (item.selectedSize || "") &&
+          (i.selectedColor || "") === (item.selectedColor || "")
       );
       if (existingItem) {
         return {
           items: state.items.map((i) =>
-            i.id === item.id && i.selectedSize === item.selectedSize && i.selectedColor === item.selectedColor
+            i.id === item.id &&
+            (i.selectedSize || "") === (item.selectedSize || "") &&
+            (i.selectedColor || "") === (item.selectedColor || "")
               ? { ...i, quantity: i.quantity + item.quantity }
               : i
           ),
@@ -49,12 +54,21 @@ export const useCartStore = create<CartState>((set, get) => ({
     }),
   removeItem: (id, size, color) =>
     set((state) => ({
-      items: state.items.filter((i) => !(i.id === id && i.selectedSize === size && i.selectedColor === color)),
+      items: state.items.filter(
+        (i) =>
+          !(
+            i.id === id &&
+            (i.selectedSize || "") === (size || "") &&
+            (i.selectedColor || "") === (color || "")
+          )
+      ),
     })),
   updateQuantity: (id, delta, size, color) =>
     set((state) => ({
       items: state.items.map((i) =>
-        i.id === id && i.selectedSize === size && i.selectedColor === color
+        i.id === id &&
+        (i.selectedSize || "") === (size || "") &&
+        (i.selectedColor || "") === (color || "")
           ? { ...i, quantity: Math.max(1, i.quantity + delta) }
           : i
       ),

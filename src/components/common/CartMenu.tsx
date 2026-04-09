@@ -1,13 +1,11 @@
 import { Theme } from "@/src/constants/theme";
 import { Images } from "@/src/constants/theme/images";
-import { useCartStore } from "@/src/store/useCartStore";
 import { useAnimatedScrollbar } from "@/src/hooks/useAnimatedScrollbar";
-import { Entypo, Ionicons } from "@expo/vector-icons";
+import { useCartStore } from "@/src/store/useCartStore";
+import { Entypo } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import CheckoutProductItem from "../checkout/CheckoutProductItem";
 import {
   Alert,
-  Dimensions,
   Image,
   Modal,
   StyleSheet,
@@ -17,8 +15,7 @@ import {
 } from "react-native";
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-const { width } = Dimensions.get("window");
+import CheckoutProductItem from "../checkout/CheckoutProductItem";
 
 export default function CartMenu() {
   const {
@@ -55,6 +52,11 @@ export default function CartMenu() {
     onScrollViewLayout,
     onTrackLayout,
   } = useAnimatedScrollbar();
+
+  const handleItemPress = (id: string) => {
+    closeCart();
+    router.push({ pathname: `/product/${id}`, params: { from: "cart" } });
+  };
 
   return (
     <Modal
@@ -98,12 +100,18 @@ export default function CartMenu() {
               </View>
             ) : (
               items.map((item) => (
-                <View key={`${item.id}-${item.selectedSize}`} style={{ paddingHorizontal: 20 }}>
+                <View
+                  key={`${item.id}-${item.selectedSize}-${item.selectedColor}`}
+                  style={{ paddingHorizontal: 20 }}
+                >
                   <CheckoutProductItem
                     item={item}
                     onUpdateQuantity={updateQuantity}
                     showRemove={true}
-                    onRemove={(id, size) => handleRemoveConfirm(id, item.name, size)}
+                    onRemove={(id, size, color) =>
+                      handleRemoveConfirm(id, item.name, size, color)
+                    }
+                    onPress={() => handleItemPress(item.id)}
                   />
                 </View>
               ))
@@ -146,7 +154,7 @@ export default function CartMenu() {
               if (items.length === 0) {
                 router.push("/products");
               } else {
-                router.push("/checkout");
+                router.push({ pathname: "/checkout", params: { from: "cart" } });
               }
             }}
           >
@@ -254,7 +262,6 @@ const styles = StyleSheet.create({
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.h3,
     color: Theme.colors.accent,
-    fontWeight: "700",
     letterSpacing: Theme.typography.letterSpacing.wider,
   },
   buyButton: {
@@ -271,7 +278,6 @@ const styles = StyleSheet.create({
     fontSize: Theme.typography.fontSize.h4,
     color: Theme.colors.white,
     letterSpacing: Theme.typography.letterSpacing.wide,
-    fontWeight: "600",
   },
   checkoutIcon: {
     width: 24,
