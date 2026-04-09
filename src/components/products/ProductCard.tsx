@@ -1,6 +1,7 @@
 import { Theme } from "@/src/constants/theme";
 import { Product } from "@/src/data/dummyProductData";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -10,15 +11,20 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, variant }: ProductCardProps) {
+  const router = useRouter();
   const [isLiked, setIsLiked] = useState(false);
 
   const handleToggleLike = () => {
     setIsLiked(!isLiked);
   };
 
+  const handlePress = () => {
+    router.push(`/product/${product.id}`);
+  };
+
   if (variant === "list") {
     return (
-      <TouchableOpacity style={styles.listContainer}>
+      <TouchableOpacity style={styles.listContainer} onPress={handlePress}>
         <Image source={{ uri: product.imageUrl }} style={styles.listImage} />
         <View style={styles.listInfo}>
           <Text style={styles.brandText}>{product.brand}</Text>
@@ -54,7 +60,7 @@ export default function ProductCard({ product, variant }: ProductCardProps) {
 
   if (variant === "large") {
     return (
-      <TouchableOpacity style={styles.largeContainer}>
+      <TouchableOpacity style={styles.largeContainer} onPress={handlePress}>
         <Image source={{ uri: product.imageUrl }} style={styles.largeImage} />
         <View style={styles.largeFooter}>
           <Text style={styles.brandText}>{product.brand}</Text>
@@ -69,7 +75,7 @@ export default function ProductCard({ product, variant }: ProductCardProps) {
 
   // Default Grid View
   return (
-    <TouchableOpacity style={styles.gridContainer}>
+    <TouchableOpacity style={styles.gridContainer} onPress={handlePress}>
       <Image source={{ uri: product.imageUrl }} style={styles.gridImage} />
       <View style={styles.gridFooter}>
         <Text style={styles.brandText}>{product.brand}</Text>
