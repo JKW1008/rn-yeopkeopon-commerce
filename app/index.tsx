@@ -7,7 +7,7 @@ import SnsSection from "@/src/components/home/SnsSection";
 import AppFooter from "@/src/components/ui/AppFooter";
 import AppHeader from "@/src/components/ui/AppHeader";
 import { Colors } from "@/src/constants/theme/colors";
-import { DUMMY_PRODUCTS } from "@/src/data/dummyProducts";
+import { DUMMY_PRODUCTS } from "@/src/data/dummyProductData";
 import { ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HomeProductSection from "../src/components/home/HomeProductSection";

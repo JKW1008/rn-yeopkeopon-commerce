@@ -8,13 +8,18 @@ import AppFooter from "@/src/components/ui/AppFooter";
 import ProductHeader, { SortOption } from "@/src/components/products/ProductHeader";
 import ProductCard from "@/src/components/products/ProductCard";
 import { Theme } from "@/src/constants/theme";
+import { useViewStore } from "@/src/store/useViewStore";
 import { Ionicons } from "@expo/vector-icons";
 
 const PAGE_SIZE = 10;
 
 const CATEGORY_MAP: Record<string, string[]> = {
   "Apparel": ["Outer", "Dress", "Knitwear"],
-  "New": ["Just In", "Trending", "Lookbook"],
+  "New": [], // New는 현재 모든 상품 노출
+  "Bag": ["Bag"],
+  "Shoes": ["Shoes"],
+  "Accessories": ["Accessories"],
+  "Beauty": [],
 };
 
 export default function ProductsScreen() {
@@ -23,10 +28,9 @@ export default function ProductsScreen() {
     subCategory?: string;
   }>();
 
-  const [viewMode, setViewMode] = useState<"grid" | "list" | "large">("grid");
+  const { viewMode, toggleViewMode } = useViewStore();
   const [sortOption, setSortOption] = useState<SortOption>("New");
   
-  // 기본값을 명시적으로 "All"로 강제 설정하여 데이터 유실 방지
   const [activeFilter, setActiveFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [chips, setChips] = useState<string[]>([]);
@@ -34,20 +38,34 @@ export default function ProductsScreen() {
   // 초기 파라미터 및 변경 시 상태 동기화 로직 강화
   useEffect(() => {
     const filterFromParams = params.subCategory || params.category || "All";
-    setActiveFilter(filterFromParams);
+    
+    // 해당 필터에 실제 데이터가 있는지 체크 (사용자 요청: 없으면 "All"로 처리)
+    const hasData = DUMMY_PRODUCTS.some(p => {
+      if (filterFromParams === "All") return true;
+      if (filterFromParams === "Apparel") return CATEGORY_MAP["Apparel"].includes(p.category);
+      if (filterFromParams === "New" || filterFromParams === "Beauty") return true;
+      return p.category === filterFromParams;
+    });
+
+    const finalFilter = hasData ? filterFromParams : "All";
+
+    setActiveFilter(finalFilter);
     setCurrentPage(1);
     
     const newChips: string[] = [];
-    if (params.category) newChips.push(params.category);
-    if (params.subCategory) newChips.push(params.subCategory);
-    setChips(newChips);
+    if (params.category && params.category !== "All") newChips.push(params.category);
+    if (params.subCategory && params.subCategory !== "All") newChips.push(params.subCategory);
+    
+    // 만약 데이터가 없어서 All로 강제 전환된 경우라면 칩을 비움
+    if (!hasData) {
+      setChips([]);
+    } else {
+      setChips(newChips);
+    }
   }, [params.category, params.subCategory]);
 
-  const toggleViewMode = () => {
-    if (viewMode === "grid") setViewMode("list");
-    else if (viewMode === "list") setViewMode("large");
-    else setViewMode("grid");
-  };
+  // toggleViewMode는 이제 store에서 가져옴
+  // const toggleViewMode = () => { ... };
 
   const handleChipRemove = (chip: string) => {
     const updatedChips = chips.filter((c) => c !== chip);
@@ -158,7 +176,10 @@ export default function ProductsScreen() {
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         numColumns={viewMode === "grid" ? 2 : 1}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[
+          styles.listContent,
+          viewMode !== "grid" && { paddingHorizontal: 20 }
+        ]}
         columnWrapperStyle={viewMode === "grid" ? styles.columnWrapper : null}
         ListHeaderComponent={
           <ProductHeader

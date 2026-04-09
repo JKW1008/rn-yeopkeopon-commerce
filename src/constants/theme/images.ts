@@ -45,4 +45,15 @@ export const Images = {
       jihyn2: require("@/assets/images/home/profile/jihyn2.png"),
     },
   },
+  productDetail: {
+    bleach: require("@/assets/images/productDetail/bleach.png"),
+    dry: require("@/assets/images/productDetail/dry.png"),
+    export: require("@/assets/images/productDetail/export.png"),
+    iron: require("@/assets/images/productDetail/iron.png"),
+    refresh: require("@/assets/images/productDetail/refresh.png"),
+    resize: require("@/assets/images/productDetail/resize.png"),
+    shipping: require("@/assets/images/productDetail/shipping.png"),
+    tag: require("@/assets/images/productDetail/tag.png"),
+    wash: require("@/assets/images/productDetail/wash.png"),
+  },
 } as const;

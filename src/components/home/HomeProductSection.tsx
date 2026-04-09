@@ -1,16 +1,18 @@
 import { Theme } from "@/src/constants/theme";
-import { Product } from "@/src/types/database";
+import { Product } from "@/src/data/dummyProductData";
 import { Feather } from "@expo/vector-icons";
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import ProductCard from "../common/ProductCard";
+import ProductCard from "../products/ProductCard";
 import CategoryTabs from "./CategoryTabs";
+import { useRouter } from "expo-router";
 
 export default function HomeProductSection({
   products,
 }: {
   products: Product[];
 }) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("All");
 
   const displayProducts = products
@@ -24,18 +26,17 @@ export default function HomeProductSection({
       </View>
       <View style={styles.grid}>
         {displayProducts.map((item) => (
-          <View key={item.id} style={styles.cardWrapper}>
-            <ProductCard
-              product={item}
-              onPress={(id) => console.log("상품 클릭됨! ID:", id)}
-            />
-          </View>
+          <ProductCard
+            key={item.id}
+            product={item}
+            variant="grid"
+          />
         ))}
       </View>
       <TouchableOpacity
         style={styles.moreButton}
         activeOpacity={0.6}
-        onPress={() => console.log("Explore More 클릭")}
+        onPress={() => router.push("/products")}
       >
         <Text style={styles.moreText}>Explore More</Text>
         <Feather name="arrow-right" size={16} color={Theme.colors.primary} />

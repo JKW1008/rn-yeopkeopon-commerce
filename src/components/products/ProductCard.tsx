@@ -1,7 +1,10 @@
 import { Theme } from "@/src/constants/theme";
 import { Product } from "@/src/data/dummyProductData";
+import { useWishlistStore } from "@/src/store/useWishlistStore";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import * as Haptics from "expo-haptics";
+import { useRouter } from "expo-router";
+import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface ProductCardProps {
@@ -10,19 +13,42 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, variant }: ProductCardProps) {
-  const [isLiked, setIsLiked] = useState(false);
+  const router = useRouter();
+  const { toggleLike, wishlistIds } = useWishlistStore();
+  const isLiked = wishlistIds.includes(product.id);
 
   const handleToggleLike = () => {
-    setIsLiked(!isLiked);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    toggleLike(product.id);
+  };
+
+  const handlePress = () => {
+    router.push(`/product/${product.id}`);
   };
 
   if (variant === "list") {
+    const isApparel = ["Outer", "Dress", "Knitwear"].includes(product.category);
+
     return (
-      <TouchableOpacity style={styles.listContainer}>
-        <Image source={{ uri: product.imageUrl }} style={styles.listImage} />
+      <TouchableOpacity style={styles.listContainer} onPress={handlePress}>
+        <View style={styles.listImageWrapper}>
+          <Image source={{ uri: product.imageUrl }} style={styles.listImage} />
+          <TouchableOpacity
+            style={styles.imageHeartButton}
+            onPress={handleToggleLike}
+          >
+            <Ionicons
+              name={isLiked ? "heart" : "heart-outline"}
+              size={22}
+              color={isLiked ? "#DD8560" : "#DD8560"}
+            />
+          </TouchableOpacity>
+        </View>
         <View style={styles.listInfo}>
           <Text style={styles.brandText}>{product.brand}</Text>
-          <Text style={[styles.nameText, styles.listNameText]}>{product.name}</Text>
+          <Text style={[styles.nameText, styles.listNameText]}>
+            {product.name}
+          </Text>
           <Text style={styles.listPriceText}>{`$${product.price}`}</Text>
 
           <View style={styles.ratingRow}>
@@ -30,23 +56,18 @@ export default function ProductCard({ product, variant }: ProductCardProps) {
             <Text style={styles.ratingText}>{`${product.rating} Ratings`}</Text>
           </View>
 
-          <View style={styles.sizeSection}>
-            <Text style={styles.sizeTitle}>{`Size`}</Text>
-            <View style={styles.sizeRow}>
-              {["S", "M", "L"].map((size) => (
-                <View key={size} style={styles.sizeCircle}>
-                  <Text style={styles.sizeText}>{size}</Text>
-                </View>
-              ))}
+          {isApparel && (
+            <View style={styles.sizeSection}>
+              <Text style={styles.sizeTitle}>{`Size`}</Text>
+              <View style={styles.sizeRow}>
+                {product.sizes.map((size) => (
+                  <View key={size} style={styles.sizeCircle}>
+                    <Text style={styles.sizeText}>{size}</Text>
+                  </View>
+                ))}
+              </View>
             </View>
-            <TouchableOpacity style={styles.heartButton} onPress={handleToggleLike}>
-              <Ionicons
-                name={isLiked ? "heart" : "heart-outline"}
-                size={22}
-                color={isLiked ? "#DD8560" : "#DD8560"}
-              />
-            </TouchableOpacity>
-          </View>
+          )}
         </View>
       </TouchableOpacity>
     );
@@ -54,14 +75,24 @@ export default function ProductCard({ product, variant }: ProductCardProps) {
 
   if (variant === "large") {
     return (
-      <TouchableOpacity style={styles.largeContainer}>
-        <Image source={{ uri: product.imageUrl }} style={styles.largeImage} />
+      <TouchableOpacity style={styles.largeContainer} onPress={handlePress}>
+        <View style={styles.imageWrapper}>
+          <Image source={{ uri: product.imageUrl }} style={styles.largeImage} />
+          <TouchableOpacity
+            style={styles.imageHeartButton}
+            onPress={handleToggleLike}
+          >
+            <Ionicons
+              name={isLiked ? "heart" : "heart-outline"}
+              size={22}
+              color={isLiked ? "#DD8560" : "#DD8560"}
+            />
+          </TouchableOpacity>
+        </View>
         <View style={styles.largeFooter}>
           <Text style={styles.brandText}>{product.brand}</Text>
-          <View style={styles.largeNamePrice}>
-            <Text style={styles.largeNameText}>{product.name}</Text>
-            <Text style={styles.priceText}>{`$${product.price}`}</Text>
-          </View>
+          <Text style={styles.largeNameText}>{product.name}</Text>
+          <Text style={styles.priceText}>{`$${product.price}`}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -69,8 +100,20 @@ export default function ProductCard({ product, variant }: ProductCardProps) {
 
   // Default Grid View
   return (
-    <TouchableOpacity style={styles.gridContainer}>
-      <Image source={{ uri: product.imageUrl }} style={styles.gridImage} />
+    <TouchableOpacity style={styles.gridContainer} onPress={handlePress}>
+      <View style={styles.imageWrapper}>
+        <Image source={{ uri: product.imageUrl }} style={styles.gridImage} />
+        <TouchableOpacity
+          style={styles.imageHeartButton}
+          onPress={handleToggleLike}
+        >
+          <Ionicons
+            name={isLiked ? "heart" : "heart-outline"}
+            size={22}
+            color={isLiked ? "#DD8560" : "#DD8560"}
+          />
+        </TouchableOpacity>
+      </View>
       <View style={styles.gridFooter}>
         <Text style={styles.brandText}>{product.brand}</Text>
         <Text style={styles.nameText} numberOfLines={2}>
@@ -104,6 +147,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#DD8560",
     fontWeight: "700",
+  },
+  imageWrapper: {
+    position: "relative",
+    width: "100%",
+  },
+  imageHeartButton: {
+    position: "absolute",
+    right: 8,
+    bottom: 8,
+    padding: 4,
   },
   listNameText: {
     fontSize: 18,
@@ -139,8 +192,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingHorizontal: 20,
   },
-  listImage: {
+  listImageWrapper: {
     width: "35%",
+    position: "relative",
+  },
+  listImage: {
+    width: "100%",
     height: 160,
     backgroundColor: "#f5f5f5",
   },
@@ -177,13 +234,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   sizeCircle: {
-    width: 28,
+    minWidth: 28,
     height: 28,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: "#D9D9D9",
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 4,
   },
   sizeText: {
     fontSize: 12,
@@ -198,27 +256,20 @@ const styles = StyleSheet.create({
   largeContainer: {
     width: "100%",
     marginBottom: 30,
-    paddingHorizontal: 20,
   },
   largeImage: {
     width: "100%",
-    height: 450,
+    aspectRatio: 3 / 4,
     backgroundColor: "#f5f5f5",
   },
   largeFooter: {
     paddingVertical: 15,
     paddingHorizontal: 10,
   },
-  largeNamePrice: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   largeNameText: {
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: 16,
     color: Theme.colors.secondary,
-    flex: 1,
-    marginRight: 10,
+    marginBottom: 4,
   },
 });

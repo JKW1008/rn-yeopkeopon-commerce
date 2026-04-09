@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { DUMMY_PRODUCTS } from "../data/dummyProducts";
+import { DUMMY_PRODUCTS } from "../data/dummyProductData";
 
 export interface CartItem {
   id: string;
@@ -27,11 +27,11 @@ export const useCartStore = create<CartState>((set, get) => ({
   items: DUMMY_PRODUCTS.slice(0, 4).map((p) => ({
     id: p.id,
     name: p.name,
-    subTitle: `${p.options?.colors?.[0] || ""} / ${p.options?.sizes?.[0] || ""}`,
+    subTitle: `${p.brand} / ${p.sizes[0] || "O/S"}`,
     description: p.description,
     price: p.price,
     quantity: 1,
-    image: { uri: p.images?.[0] },
+    image: { uri: p.imageUrl },
   })),
   openCart: () => set({ isOpen: true }),
   closeCart: () => set({ isOpen: false }),
