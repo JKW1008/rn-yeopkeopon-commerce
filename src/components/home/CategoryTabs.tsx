@@ -81,7 +81,6 @@ const styles = StyleSheet.create({
   },
   activTabText: {
     color: Theme.colors.primary,
-    fontWeight: "500",
   },
   activeDot: {
     marginTop: 6,
