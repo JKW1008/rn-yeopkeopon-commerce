@@ -1,6 +1,8 @@
 import { Theme } from "@/src/constants/theme";
 import { Images } from "@/src/constants/theme/images";
 import { useMenuStore } from "@/src/store/useMenuStore";
+import { useAnimatedScrollbar } from "@/src/hooks/useAnimatedScrollbar";
+import TitleUnderline from "@/src/components/common/TitleUnderline";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import { useState } from "react";
 import { useRouter } from "expo-router";
@@ -12,15 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Animated, {
-  LinearTransition,
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  useSharedValue,
-  withDelay,
-  withSequence,
-  withTiming,
-} from "react-native-reanimated";
+import Animated, { LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const TABS = ["WOMEN", "MEN", "KIDS"];
@@ -79,47 +73,14 @@ export default function ToggleMenu() {
     });
   };
 
-  const scrollY = useSharedValue(0);
-  const contentHeight = useSharedValue(1);
-  const scrollViewHeight = useSharedValue(1);
-  const scrollOpacity = useSharedValue(0);
-  const trackHeightSV = useSharedValue(0);
-  const contentMeasured = useSharedValue(false); // onContentSizeChange 실행 여부
-
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
-      // UI 스레드에서 직접 처리 - JS 브릿지 없음
-      // 스크롤 중엔 즉시 fade-in, 멈추면 1.2초 뒤 fade-out
-      scrollOpacity.value = withSequence(
-        withTiming(1, { duration: 150 }),
-        withDelay(1200, withTiming(0, { duration: 600 })),
-      );
-    },
-  });
-
-  const trackStyle = useAnimatedStyle(() => {
-    const ready = trackHeightSV.value > 10 && scrollViewHeight.value > 10;
-    return { opacity: ready ? scrollOpacity.value : 0 };
-  });
-
-  const indicatorStyle = useAnimatedStyle(() => {
-    const tHeight = trackHeightSV.value;
-    const sHeight = scrollViewHeight.value;
-
-    if (tHeight <= 10 || sHeight <= 10 || !contentMeasured.value) {
-      return { transform: [{ translateY: 0 }] };
-    }
-
-    const cHeight = contentHeight.value;
-    const thumbH = tHeight * 0.8;
-    const maxThumbTravel = tHeight - thumbH;
-    const maxScroll = Math.max(cHeight - sHeight, 1);
-    const rawY = (scrollY.value / maxScroll) * maxThumbTravel;
-    const translateY = Math.max(0, Math.min(rawY, maxThumbTravel));
-
-    return { transform: [{ translateY }] };
-  });
+  const {
+    scrollHandler,
+    trackStyle,
+    indicatorStyle,
+    onContentSizeChange,
+    onScrollViewLayout,
+    onTrackLayout,
+  } = useAnimatedScrollbar();
 
   const toggleExpand = (id: string) => {
     setExpandedCategory((prev) => (prev === id ? null : id));
@@ -174,13 +135,8 @@ export default function ToggleMenu() {
             showsVerticalScrollIndicator={false}
             onScroll={scrollHandler}
             scrollEventThrottle={16}
-            onContentSizeChange={(_, h) => {
-              contentHeight.value = h;
-              contentMeasured.value = true;
-            }}
-            onLayout={(e) => {
-              scrollViewHeight.value = e.nativeEvent.layout.height;
-            }}
+            onContentSizeChange={(_, h) => onContentSizeChange(_, h)}
+            onLayout={(e) => onScrollViewLayout(e.nativeEvent.layout.height)}
           >
             {CATEGORIES.map((cat) => (
               <Animated.View
@@ -242,16 +198,9 @@ export default function ToggleMenu() {
                 <Text style={styles.infoText}>Store locator</Text>
               </View>
             </View>
-            <Image
-              source={Images.home.titleUnderline}
-              style={{
-                width: 150,
-                height: 15,
-                alignSelf: "center",
-                marginTop: 30,
-              }}
-              resizeMode="contain"
-            />
+            <View style={{ alignSelf: "center", marginTop: 30 }}>
+              <TitleUnderline />
+            </View>
             <View style={styles.socialContainer}>
               <TouchableOpacity style={styles.iconButton}>
                 <Image
@@ -278,9 +227,7 @@ export default function ToggleMenu() {
           </Animated.ScrollView>
           <Animated.View
             style={[styles.scrollTrack, trackStyle]}
-            onLayout={(e) => {
-              trackHeightSV.value = e.nativeEvent.layout.height;
-            }}
+            onLayout={(e) => onTrackLayout(e.nativeEvent.layout.height)}
           >
             <Animated.View style={[styles.scrollThumb, indicatorStyle]} />
           </Animated.View>
@@ -293,7 +240,7 @@ export default function ToggleMenu() {
 const styles = StyleSheet.create({
   fullScreenContainer: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: Theme.colors.white,
   },
   header: {
     paddingHorizontal: 20,
@@ -325,7 +272,7 @@ const styles = StyleSheet.create({
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.md,
     color: Theme.colors.grey[400],
-    letterSpacing: 4,
+    letterSpacing: Theme.typography.letterSpacing.extraWide,
   },
   activeTabText: {
     color: Theme.colors.primary,
@@ -403,10 +350,10 @@ const styles = StyleSheet.create({
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.h4,
     color: Theme.colors.primary,
-    letterSpacing: 0.5,
+    letterSpacing: Theme.typography.letterSpacing.fine,
   },
   container: {
-    backgroundColor: "#ffffff2c",
+    backgroundColor: "rgba(255,255,255,0.17)",
     paddingTop: 30,
     width: "100%",
     flexDirection: "column",

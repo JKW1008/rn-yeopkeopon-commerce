@@ -1,11 +1,19 @@
 import { Theme } from "@/src/constants/theme";
 import { Product } from "@/src/data/dummyProductData";
-import { useWishlistStore } from "@/src/store/useWishlistStore";
+import { useProductWishlist } from "@/src/hooks/useProductWishlist";
 import { Ionicons } from "@expo/vector-icons";
-import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+const { width } = Dimensions.get("window");
 
 interface ProductCardProps {
   product: Product;
@@ -14,13 +22,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, variant }: ProductCardProps) {
   const router = useRouter();
-  const { toggleLike, wishlistIds } = useWishlistStore();
-  const isLiked = wishlistIds.includes(product.id);
-
-  const handleToggleLike = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    toggleLike(product.id);
-  };
+  const { isLiked, handleToggleLike } = useProductWishlist(product.id);
 
   const handlePress = () => {
     router.push(`/product/${product.id}`);
@@ -34,40 +36,47 @@ export default function ProductCard({ product, variant }: ProductCardProps) {
         <View style={styles.listImageWrapper}>
           <Image source={{ uri: product.imageUrl }} style={styles.listImage} />
           <TouchableOpacity
-            style={styles.imageHeartButton}
+            style={[styles.imageHeartButton, styles.listHeartButton]}
             onPress={handleToggleLike}
           >
             <Ionicons
               name={isLiked ? "heart" : "heart-outline"}
               size={22}
-              color={isLiked ? "#DD8560" : "#DD8560"}
+              color={Theme.colors.accent}
             />
           </TouchableOpacity>
         </View>
         <View style={styles.listInfo}>
-          <Text style={styles.brandText}>{product.brand}</Text>
-          <Text style={[styles.nameText, styles.listNameText]}>
+          <Text style={styles.listBrandText}>{product.brand || "LAMEREI"}</Text>
+          <Text style={styles.listNameText} numberOfLines={1}>
             {product.name}
           </Text>
-          <Text style={styles.listPriceText}>{`$${product.price}`}</Text>
 
-          <View style={styles.ratingRow}>
-            <Ionicons name="star" size={14} color="#DD8560" />
-            <Text style={styles.ratingText}>{`${product.rating} Ratings`}</Text>
-          </View>
+          <View style={styles.listMetaColumn}>
+            <Text style={styles.priceText}>{`$${product.price}`}</Text>
 
-          {isApparel && (
-            <View style={styles.sizeSection}>
-              <Text style={styles.sizeTitle}>{`Size`}</Text>
-              <View style={styles.sizeRow}>
-                {product.sizes.map((size) => (
-                  <View key={size} style={styles.sizeCircle}>
-                    <Text style={styles.sizeText}>{size}</Text>
-                  </View>
-                ))}
-              </View>
+            <View style={styles.listRatingRow}>
+              <Ionicons name="star" size={14} color={Theme.colors.accent} />
+              <Text style={styles.listRatingText}>
+                {product.rating} Ratings
+              </Text>
             </View>
-          )}
+
+            {isApparel && product.sizes && product.sizes.length > 0 && (
+              <View style={styles.listSizesGroup}>
+                <View style={styles.sizeLabelContainer}>
+                  <Text style={styles.sizeLabelText}>Size</Text>
+                </View>
+                <View style={styles.listSizesRow}>
+                  {product.sizes.slice(0, 3).map((size) => (
+                    <View key={size} style={styles.listSizeChip}>
+                      <Text style={styles.listSizeText}>{size}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -85,7 +94,7 @@ export default function ProductCard({ product, variant }: ProductCardProps) {
             <Ionicons
               name={isLiked ? "heart" : "heart-outline"}
               size={22}
-              color={isLiked ? "#DD8560" : "#DD8560"}
+              color={Theme.colors.accent}
             />
           </TouchableOpacity>
         </View>
@@ -110,7 +119,7 @@ export default function ProductCard({ product, variant }: ProductCardProps) {
           <Ionicons
             name={isLiked ? "heart" : "heart-outline"}
             size={22}
-            color={isLiked ? "#DD8560" : "#DD8560"}
+            color={Theme.colors.accent}
           />
         </TouchableOpacity>
       </View>
@@ -129,24 +138,25 @@ const styles = StyleSheet.create({
   // Common Styles
   brandText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 17,
-    color: "#333",
-    fontWeight: "600",
-    letterSpacing: 1.5,
+    fontSize: Theme.typography.fontSize.md,
+    color: Theme.colors.primary,
+    letterSpacing: Theme.typography.letterSpacing.wider,
     marginBottom: 4,
+    textTransform: "uppercase",
+    fontWeight: "600",
   },
   nameText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 14,
+    fontSize: Theme.typography.fontSize.base,
     color: Theme.colors.secondary,
-    lineHeight: 20,
+    lineHeight: Theme.typography.lineHeight.base,
     marginBottom: 4,
   },
   priceText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 16,
-    color: "#DD8560",
-    fontWeight: "700",
+    fontSize: Theme.typography.fontSize.lg,
+    color: Theme.colors.accent,
+    letterSpacing: Theme.typography.letterSpacing.wide,
   },
   imageWrapper: {
     position: "relative",
@@ -154,57 +164,142 @@ const styles = StyleSheet.create({
   },
   imageHeartButton: {
     position: "absolute",
-    right: 8,
-    bottom: 8,
+    right: 12,
+    bottom: 12,
     padding: 4,
   },
+  listHeartButton: {
+    right: 8,
+    bottom: 8,
+  },
   listNameText: {
-    fontSize: 18,
-    color: Theme.colors.primary,
-    marginBottom: 8,
+    fontSize: Theme.typography.fontSize.md,
+    color: Theme.colors.grey[500],
+    marginBottom: 4,
   },
-  listPriceText: {
-    fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 18,
-    color: "#DD8560",
-    fontWeight: "700",
-    marginTop: 12,
-  },
-
   // Grid Styles
   gridContainer: {
-    width: "48%",
-    marginBottom: 20,
+    width: "49%",
   },
   gridImage: {
     width: "100%",
     height: 220,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: Theme.colors.grey[100],
   },
   gridFooter: {
     paddingVertical: 10,
+  },
+  listBrandText: {
+    fontFamily: Theme.typography.fontFamily.main,
+    fontSize: Theme.typography.fontSize.base,
+    color: Theme.colors.primary,
+    textTransform: "uppercase",
+    marginBottom: 4,
+    letterSpacing: Theme.typography.letterSpacing.wider,
+  },
+
+  listMetaColumn: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: 10,
+    marginTop: 8,
+  },
+  listRatingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  listRatingText: {
+    fontFamily: Theme.typography.fontFamily.main,
+    fontSize: Theme.typography.fontSize.base,
+    color: Theme.colors.secondary,
+    lineHeight: Theme.typography.lineHeight.tight18, // 텍스트 높이를 명시적으로 설정하여 중앙 정렬 보정
+    textAlignVertical: "center", // 안드로이드 대응
+  },
+  listSizesGroup: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  sizeLabelContainer: {
+    height: 20,
+    justifyContent: "center",
+    paddingTop: 1, // 베이스라인 미세 조정
+  },
+  sizeLabelText: {
+    fontFamily: Theme.typography.fontFamily.main,
+    fontSize: Theme.typography.fontSize.base,
+    color: Theme.colors.secondary,
+    letterSpacing: Theme.typography.letterSpacing.fine,
+  },
+  listSizesRow: {
+    flexDirection: "row",
+    gap: 5,
+  },
+  listSizeChip: {
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Theme.colors.grey[200],
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 2,
+  },
+  listSizeText: {
+    fontFamily: Theme.typography.fontFamily.main,
+    fontSize: Theme.typography.fontSize.nano,
+    color: Theme.colors.grey[500],
+    textTransform: "uppercase",
   },
 
   // List Styles
   listContainer: {
     flexDirection: "row",
-    backgroundColor: "#fff",
-    marginBottom: 20,
-    paddingHorizontal: 20,
+    backgroundColor: Theme.colors.white,
   },
   listImageWrapper: {
-    width: "35%",
+    width: width * 0.3,
+    height: width * 0.4,
     position: "relative",
   },
   listImage: {
     width: "100%",
-    height: 160,
-    backgroundColor: "#f5f5f5",
+    height: "100%",
+    backgroundColor: Theme.colors.surface,
   },
   listInfo: {
     flex: 1,
-    paddingLeft: 16,
-    paddingVertical: 8,
+    paddingLeft: 18,
+    paddingVertical: 12, // 상단부터 균일하게 시작하도록 패딩 추가
+    justifyContent: "flex-start",
+  },
+  listHeaderSection: {
+    height: 60,
+    marginBottom: 4,
+  },
+  listPriceSection: {
+    height: 30,
+    marginBottom: 8,
+    justifyContent: "center",
+  },
+  listFooterSection: {
+    height: 60,
+    justifyContent: "flex-end",
+  },
+  listSizeContainer: {
+    height: 35,
+    marginTop: 4,
+  },
+  ratingStars: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  listSizes: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   ratingRow: {
     flexDirection: "row",
@@ -215,7 +310,7 @@ const styles = StyleSheet.create({
   },
   ratingText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 14,
+    fontSize: Theme.typography.fontSize.base,
     color: Theme.colors.secondary,
   },
   sizeSection: {
@@ -225,7 +320,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   sizeTitle: {
-    fontSize: 14,
+    fontSize: Theme.typography.fontSize.base,
     color: Theme.colors.secondary,
     fontFamily: Theme.typography.fontFamily.main,
   },
@@ -238,13 +333,13 @@ const styles = StyleSheet.create({
     height: 28,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#D9D9D9",
+    borderColor: Theme.colors.grey[300],
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 4,
   },
   sizeText: {
-    fontSize: 12,
+    fontSize: Theme.typography.fontSize.xs,
     color: Theme.colors.primary,
   },
   heartButton: {
@@ -255,20 +350,18 @@ const styles = StyleSheet.create({
   // Large Styles
   largeContainer: {
     width: "100%",
-    marginBottom: 30,
   },
   largeImage: {
     width: "100%",
     aspectRatio: 3 / 4,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: Theme.colors.grey[100],
   },
   largeFooter: {
     paddingVertical: 15,
-    paddingHorizontal: 10,
   },
   largeNameText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 16,
+    fontSize: Theme.typography.fontSize.lg,
     color: Theme.colors.secondary,
     marginBottom: 4,
   },

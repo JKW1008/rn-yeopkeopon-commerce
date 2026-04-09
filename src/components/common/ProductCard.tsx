@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   },
   largeProductName: {
     fontSize: Theme.typography.fontSize.md,
-    lineHeight: 20,
+    lineHeight: Theme.typography.lineHeight.base,
     marginBottom: 8,
   },
   price: {
