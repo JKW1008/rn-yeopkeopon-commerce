@@ -9,6 +9,7 @@ export const Typography = {
     display: 40,
     h1: 32,
     h2: 24,
+    h2_md: 28,
     h3: 20,
     h4: 18,
 
@@ -20,14 +21,17 @@ export const Typography = {
     xs: 12,
     tiny: 11,
     pixel: 10,
+    nano: 9,
   },
 
   letterSpacing: {
     tighter: -0.8,
     tight: -0.5,
     normal: 0,
+    fine: 0.5,
     wide: 1,
     wider: 2,
+    semiWide: 3,
     extraWide: 4,
     luxury: 6,
     display: 8,
@@ -41,5 +45,16 @@ export const Typography = {
     relaxed: 1.75,
     loose: 2,
     luxury: 2.2,
+    // 절대값 대응 (Fixed values for RN alignment)
+    h1: 38,
+    h2_md: 34,
+    h2: 30,
+    h3: 26,
+    h4: 22,
+    base: 20,
+    tight18: 18,
+    fixed28: 28,
+    fixed26: 26,
+    fixed24: 24,
   },
 };

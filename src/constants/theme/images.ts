@@ -56,4 +56,12 @@ export const Images = {
     tag: require("@/assets/images/productDetail/tag.png"),
     wash: require("@/assets/images/productDetail/wash.png"),
   },
+  checkoutStickers: {
+    voucher: require("@/assets/images/checkout/voucher.png"),
+    delivery: require("@/assets/images/checkout/delivery.png"),
+    success: require("@/assets/images/checkout/success.png"),
+    disappointed: require("@/assets/images/checkout/disappointed.png"),
+    happy: require("@/assets/images/checkout/happy.png"),
+    love: require("@/assets/images/checkout/love.png"),
+  },
 } as const;
