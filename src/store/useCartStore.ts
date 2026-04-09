@@ -4,11 +4,14 @@ import { DUMMY_PRODUCTS } from "../data/dummyProductData";
 export interface CartItem {
   id: string;
   name: string;
+  brand: string;
   subTitle?: string;
   description?: string;
   price: number;
   quantity: number;
   image: any;
+  selectedSize?: string;
+  selectedColor?: string;
 }
 
 interface CartState {
@@ -17,48 +20,47 @@ interface CartState {
   openCart: () => void;
   closeCart: () => void;
   addItem: (item: CartItem) => void;
-  removeItem: (id: string) => void;
-  updateQuantity: (id: string, delta: number) => void;
+  removeItem: (id: string, size?: string, color?: string) => void;
+  updateQuantity: (id: string, delta: number, size?: string, color?: string) => void;
   getTotalPrice: () => number;
+  clearCart: () => void;
 }
 
 export const useCartStore = create<CartState>((set, get) => ({
   isOpen: false,
-  items: DUMMY_PRODUCTS.slice(0, 4).map((p) => ({
-    id: p.id,
-    name: p.name,
-    subTitle: `${p.brand} / ${p.sizes[0] || "O/S"}`,
-    description: p.description,
-    price: p.price,
-    quantity: 1,
-    image: { uri: p.imageUrl },
-  })),
+  items: [],
   openCart: () => set({ isOpen: true }),
   closeCart: () => set({ isOpen: false }),
   addItem: (item) =>
     set((state) => {
-      const existingItem = state.items.find((i) => i.id === item.id);
+      const existingItem = state.items.find(
+        (i) => i.id === item.id && i.selectedSize === item.selectedSize && i.selectedColor === item.selectedColor
+      );
       if (existingItem) {
         return {
           items: state.items.map((i) =>
-            i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+            i.id === item.id && i.selectedSize === item.selectedSize && i.selectedColor === item.selectedColor
+              ? { ...i, quantity: i.quantity + item.quantity }
+              : i
           ),
         };
       }
       return { items: [...state.items, item] };
     }),
-  removeItem: (id) =>
+  removeItem: (id, size, color) =>
     set((state) => ({
-      items: state.items.filter((i) => i.id !== id),
+      items: state.items.filter((i) => !(i.id === id && i.selectedSize === size && i.selectedColor === color)),
     })),
-  updateQuantity: (id, delta) =>
+  updateQuantity: (id, delta, size, color) =>
     set((state) => ({
-      items: state.items
-        .map((i) =>
-          i.id === id ? { ...i, quantity: Math.max(1, i.quantity + delta) } : i
-        ),
+      items: state.items.map((i) =>
+        i.id === id && i.selectedSize === size && i.selectedColor === color
+          ? { ...i, quantity: Math.max(1, i.quantity + delta) }
+          : i
+      ),
     })),
   getTotalPrice: () => {
     return get().items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   },
+  clearCart: () => set({ items: [] }),
 }));
