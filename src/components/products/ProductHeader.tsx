@@ -9,7 +9,7 @@ import {
   ScrollView,
   Modal,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, Feather } from "@expo/vector-icons";
 
 export type SortOption = "New" | "Price: Low to High" | "Price: High to Low" | "Rating";
 
@@ -21,7 +21,7 @@ interface ProductHeaderProps {
   onChipRemove?: (chip: string) => void;
   sortOption: SortOption;
   onSortChange: (option: SortOption) => void;
-  activeFilter: string;
+  activeFilters: string[];
   onFilterChange: (filter: string) => void;
 }
 
@@ -40,7 +40,7 @@ export default function ProductHeader({
   onChipRemove,
   sortOption,
   onSortChange,
-  activeFilter,
+  activeFilters,
   onFilterChange,
 }: ProductHeaderProps) {
   const [showSortModal, setShowSortModal] = useState(false);
@@ -48,10 +48,10 @@ export default function ProductHeader({
 
   const getViewIcon = () => {
     switch (viewMode) {
-      case "grid": return "grid-outline";
-      case "list": return "list-outline";
-      case "large": return "square-outline";
-      default: return "grid-outline";
+      case "grid": return "grid";
+      case "list": return "list";
+      case "large": return "square";
+      default: return "grid";
     }
   };
 
@@ -69,14 +69,14 @@ export default function ProductHeader({
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.iconButton} onPress={onViewChange}>
-            <Ionicons name={getViewIcon()} size={24} color={Theme.colors.primary} />
+            <Feather name={getViewIcon()} size={20} color={Theme.colors.primary} />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.iconButton, styles.filterButton]}
             onPress={() => setShowFilterModal(true)}
           >
-            <Ionicons name="filter-outline" size={24} color="#DD8560" />
+            <Ionicons name="filter-outline" size={24} color={Theme.colors.accent} />
           </TouchableOpacity>
         </View>
       </View>
@@ -161,17 +161,16 @@ export default function ProductHeader({
                   key={cat}
                   style={[
                     styles.filterChip,
-                    activeFilter === cat && styles.filterChipActive,
+                    activeFilters.includes(cat) && styles.filterChipActive,
                   ]}
                   onPress={() => {
                     onFilterChange(cat);
-                    setShowFilterModal(false);
                   }}
                 >
                   <Text
                     style={[
                       styles.filterChipText,
-                      activeFilter === cat && styles.filterChipTextActive,
+                      activeFilters.includes(cat) && styles.filterChipTextActive,
                     ]}
                   >
                     {cat}
@@ -188,9 +187,10 @@ export default function ProductHeader({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
+    backgroundColor: Theme.colors.white,
     paddingTop: 10,
-    paddingBottom: 15,
+    paddingBottom: 10,
+    marginBottom: 20,
   },
   topRow: {
     flexDirection: "row",
@@ -201,9 +201,9 @@ const styles = StyleSheet.create({
   },
   countText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 16,
+    fontSize: Theme.typography.fontSize.lg,
     color: Theme.colors.primary,
-    letterSpacing: 1,
+    letterSpacing: Theme.typography.letterSpacing.wide,
   },
   actions: {
     flexDirection: "row",
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   sortPill: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F9F9F9",
+    backgroundColor: Theme.colors.surface,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
@@ -221,14 +221,14 @@ const styles = StyleSheet.create({
   },
   sortText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 14,
+    fontSize: Theme.typography.fontSize.base,
     color: Theme.colors.primary,
   },
   iconButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#F9F9F9",
+    backgroundColor: Theme.colors.surface,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   filterButtonActive: {
     backgroundColor: "#F5E6DD",
     borderWidth: 1,
-    borderColor: "#DD8560",
+    borderColor: Theme.colors.accent,
   },
   chipsContainer: {
     paddingHorizontal: 20,
@@ -252,12 +252,12 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#F0F0F0",
+    borderColor: Theme.colors.grey[100],
     gap: 6,
   },
   chipText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 14,
+    fontSize: Theme.typography.fontSize.base,
     color: Theme.colors.primary,
   },
   modalOverlay: {
@@ -269,11 +269,11 @@ const styles = StyleSheet.create({
     paddingRight: 20,
   },
   sortModal: {
-    backgroundColor: "#fff",
+    backgroundColor: Theme.colors.white,
     borderRadius: 12,
     paddingVertical: 12,
     minWidth: 200,
-    shadowColor: "#000",
+    shadowColor: Theme.colors.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.12,
     shadowRadius: 12,
@@ -281,13 +281,13 @@ const styles = StyleSheet.create({
   },
   sortModalTitle: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 12,
+    fontSize: Theme.typography.fontSize.xs,
     color: Theme.colors.grey[400],
-    letterSpacing: 2,
+    letterSpacing: Theme.typography.letterSpacing.wider,
     paddingHorizontal: 16,
     paddingBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#F0F0F0",
+    borderBottomColor: Theme.colors.grey[100],
     marginBottom: 4,
   },
   sortOption: {
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
   },
   sortOptionText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 14,
+    fontSize: Theme.typography.fontSize.base,
     color: Theme.colors.secondary,
   },
   sortOptionActive: {
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   filterSheet: {
-    backgroundColor: "#fff",
+    backgroundColor: Theme.colors.white,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 24,
@@ -321,15 +321,15 @@ const styles = StyleSheet.create({
   filterHandle: {
     width: 40,
     height: 4,
-    backgroundColor: "#E0E0E0",
+    backgroundColor: Theme.colors.border,
     borderRadius: 2,
     alignSelf: "center",
     marginBottom: 20,
   },
   filterTitle: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 18,
-    letterSpacing: 2,
+    fontSize: Theme.typography.fontSize.h3,
+    letterSpacing: Theme.typography.letterSpacing.wider,
     color: Theme.colors.primary,
     marginBottom: 20,
   },
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#E0E0E0",
+    borderColor: Theme.colors.border,
   },
   filterChipActive: {
     backgroundColor: Theme.colors.primary,
@@ -351,11 +351,11 @@ const styles = StyleSheet.create({
   },
   filterChipText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 14,
+    fontSize: Theme.typography.fontSize.base,
     color: Theme.colors.secondary,
   },
   filterChipTextActive: {
-    color: "#fff",
+    color: Theme.colors.white,
     fontWeight: "600",
   },
 });

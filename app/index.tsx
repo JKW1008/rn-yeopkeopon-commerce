@@ -6,7 +6,7 @@ import HeroCarousel from "@/src/components/home/HeroCarousel";
 import SnsSection from "@/src/components/home/SnsSection";
 import AppFooter from "@/src/components/ui/AppFooter";
 import AppHeader from "@/src/components/ui/AppHeader";
-import { Colors } from "@/src/constants/theme/colors";
+import { Theme } from "@/src/constants/theme";
 import { DUMMY_PRODUCTS } from "@/src/data/dummyProductData";
 import { ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -37,22 +37,22 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Theme.colors.white,
   },
   scrollArea: {
     flex: 1,
   },
   title: {
-    fontSize: 28,
+    fontSize: Theme.typography.fontSize.h2_md,
     fontWeight: "700",
-    color: Colors.primary,
+    color: Theme.colors.primary,
     marginBottom: 10,
     textAlign: "center",
-    letterSpacing: 2,
+    letterSpacing: Theme.typography.letterSpacing.wider,
   },
   subtitle: {
-    fontSize: 16,
-    color: "#666",
+    fontSize: Theme.typography.fontSize.lg,
+    color: Theme.colors.grey[500],
     textAlign: "center",
   },
 });

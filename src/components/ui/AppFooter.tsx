@@ -75,7 +75,7 @@ export default function AppFooter() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
+    backgroundColor: Theme.colors.white,
     alignItems: "center",
     paddingTop: 40,
   },
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   },
   contactText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 18,
+    fontSize: Theme.typography.fontSize.h4,
     color: Theme.colors.primary,
     textAlign: "center",
   },
@@ -122,18 +122,18 @@ const styles = StyleSheet.create({
   },
   linkText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 16,
+    fontSize: Theme.typography.fontSize.lg,
     color: Theme.colors.primary,
   },
   copyrightContainer: {
-    backgroundColor: Theme.colors.grey[100] || "#f8f8f8",
+    backgroundColor: Theme.colors.grey[100],
     width: "100%",
     alignItems: "center",
     paddingVertical: 15,
   },
   copyrightText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 13,
-    color: Theme.colors.grey[500] || "#888888",
+    fontSize: Theme.typography.fontSize.sm,
+    color: Theme.colors.grey[500],
   },
 });

@@ -148,7 +148,7 @@ export default function BlogDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: Theme.colors.white,
   },
   scrollContent: {
     flexGrow: 1,
@@ -166,18 +166,18 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 18,
+    fontSize: Theme.typography.fontSize.h4,
     color: Theme.colors.primary,
     fontWeight: "700",
-    lineHeight: 28,
+    lineHeight: Theme.typography.lineHeight.fixed28,
     marginBottom: 24,
-    letterSpacing: 1,
+    letterSpacing: Theme.typography.letterSpacing.wide,
   },
   sectionText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 16,
+    fontSize: Theme.typography.fontSize.lg,
     color: Theme.colors.primary,
-    lineHeight: 26,
+    lineHeight: Theme.typography.lineHeight.fixed26,
     marginBottom: 30,
   },
   highlight: {
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
   },
   postedBy: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 14,
+    fontSize: Theme.typography.fontSize.base,
     color: Theme.colors.primary,
     marginBottom: 16,
   },
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   },
   footerTag: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 14,
+    fontSize: Theme.typography.fontSize.base,
     color: Theme.colors.secondary,
   },
   errorContainer: {
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   errorText: {
-    fontSize: 16,
+    fontSize: Theme.typography.fontSize.lg,
     color: Theme.colors.grey[500],
     marginBottom: 10,
   },

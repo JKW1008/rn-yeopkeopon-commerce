@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   FlatList,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -12,33 +11,23 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import BlogCard from "@/src/components/blog/BlogCard";
 import CategoryFilter from "@/src/components/blog/CategoryFilter";
 import LayoutSwitcher from "@/src/components/blog/LayoutSwitcher";
+import TitleUnderline from "@/src/components/common/TitleUnderline";
 import AppFooter from "@/src/components/ui/AppFooter";
 import AppHeader from "@/src/components/ui/AppHeader";
 import { Theme } from "@/src/constants/theme";
-import { Images } from "@/src/constants/theme/images";
-import { BLOG_CATEGORIES, DUMMY_BLOG_POSTS } from "@/src/data/dummyBlogData";
+import { BLOG_CATEGORIES } from "@/src/data/dummyBlogData";
+import { useBlogPostFiltering } from "@/src/hooks/useBlogPostFiltering";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function BlogScreen() {
-  const [activeCategory, setActiveCategory] = useState<string>("All");
   const [viewMode, setViewMode] = useState<"large" | "small">("large");
-  const [visibleCount, setVisibleCount] = useState(3);
-
-  const allFilteredPosts =
-    activeCategory === "All" || !activeCategory
-      ? DUMMY_BLOG_POSTS
-      : DUMMY_BLOG_POSTS.filter((post) => post.category === activeCategory);
-
-  const displayedPosts = allFilteredPosts.slice(0, visibleCount);
-
-  const handleSelectCategory = (cat: string) => {
-    setActiveCategory(cat);
-    setVisibleCount(3);
-  };
-
-  const handleLoadMore = () => {
-    setVisibleCount((prev) => prev + 3);
-  };
+  const {
+    activeCategory,
+    displayedPosts,
+    hasMore,
+    handleSelectCategory,
+    handleLoadMore,
+  } = useBlogPostFiltering();
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
@@ -51,11 +40,7 @@ export default function BlogScreen() {
             <AppHeader />
             <View style={styles.titleSection}>
               <Text style={styles.titleText}>BLOG</Text>
-              <Image
-                source={Images.home.titleUnderline}
-                style={{ width: 150, height: 15 }}
-                resizeMode="contain"
-              />
+              <TitleUnderline />
             </View>
             <View style={styles.filterBar}>
               <LayoutSwitcher
@@ -74,7 +59,7 @@ export default function BlogScreen() {
         }
         ListFooterComponent={
           <>
-            {visibleCount < allFilteredPosts.length && (
+            {hasMore && (
               <TouchableOpacity
                 style={styles.loadMoreButton}
                 onPress={handleLoadMore}
@@ -101,7 +86,7 @@ export default function BlogScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: Theme.colors.white,
   },
   titleSection: {
     alignItems: "center",
@@ -110,9 +95,9 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 24,
+    fontSize: Theme.typography.fontSize.h2,
     color: Theme.colors.primary,
-    letterSpacing: 4,
+    letterSpacing: Theme.typography.letterSpacing.extraWide,
     fontWeight: "600",
   },
   filterBar: {
@@ -141,7 +126,7 @@ const styles = StyleSheet.create({
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.lg,
     color: Theme.colors.primary,
-    letterSpacing: 1,
+    letterSpacing: Theme.typography.letterSpacing.wide,
     fontWeight: "600",
   },
   scrollContent: {

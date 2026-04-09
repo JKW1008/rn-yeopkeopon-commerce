@@ -1,9 +1,13 @@
 import { Theme } from "@/src/constants/theme";
 import { Images } from "@/src/constants/theme/images";
 import { useCartStore } from "@/src/store/useCartStore";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { useAnimatedScrollbar } from "@/src/hooks/useAnimatedScrollbar";
+import { Entypo, Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import CheckoutProductItem from "../checkout/CheckoutProductItem";
 import {
   Alert,
+  Dimensions,
   Image,
   Modal,
   StyleSheet,
@@ -11,15 +15,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Animated, {
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  useSharedValue,
-  withDelay,
-  withSequence,
-  withTiming,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const { width } = Dimensions.get("window");
 
 export default function CartMenu() {
   const {
@@ -31,61 +30,31 @@ export default function CartMenu() {
     getTotalPrice,
   } = useCartStore();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
 
-  const handleRemoveConfirm = (id: string, name: string) => {
+  const handleRemoveConfirm = (id: string, name: string, size?: string) => {
     Alert.alert(
       "REMOVE ITEM",
-      `Are you sure you want to remove ${name} from your shopping bag?`,
+      `Are you sure you want to remove ${name}${size ? ` (${size})` : ""} from your shopping bag?`,
       [
         { text: "CANCEL", style: "cancel" },
         {
           text: "REMOVE",
-          onPress: () => removeItem(id),
+          onPress: () => removeItem(id, size),
           style: "destructive",
         },
       ],
     );
   };
 
-  const scrollY = useSharedValue(0);
-  const contentHeight = useSharedValue(1);
-  const scrollViewHeight = useSharedValue(1);
-  const scrollOpacity = useSharedValue(0);
-  const trackHeightSV = useSharedValue(0);
-  const contentMeasured = useSharedValue(false);
-
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
-      scrollOpacity.value = withSequence(
-        withTiming(1, { duration: 150 }),
-        withDelay(1200, withTiming(0, { duration: 600 })),
-      );
-    },
-  });
-
-  const trackStyle = useAnimatedStyle(() => {
-    const ready = trackHeightSV.value > 10 && scrollViewHeight.value > 10;
-    return { opacity: ready ? scrollOpacity.value : 0 };
-  });
-
-  const indicatorStyle = useAnimatedStyle(() => {
-    const tHeight = trackHeightSV.value;
-    const sHeight = scrollViewHeight.value;
-
-    if (tHeight <= 10 || sHeight <= 10 || !contentMeasured.value) {
-      return { transform: [{ translateY: 0 }] };
-    }
-
-    const cHeight = contentHeight.value;
-    const thumbH = tHeight * 0.8;
-    const maxThumbTravel = tHeight - thumbH;
-    const maxScroll = Math.max(cHeight - sHeight, 1);
-    const rawY = (scrollY.value / maxScroll) * maxThumbTravel;
-    const translateY = Math.max(0, Math.min(rawY, maxThumbTravel));
-
-    return { transform: [{ translateY }] };
-  });
+  const {
+    scrollHandler,
+    trackStyle,
+    indicatorStyle,
+    onContentSizeChange,
+    onScrollViewLayout,
+    onTrackLayout,
+  } = useAnimatedScrollbar();
 
   return (
     <Modal
@@ -97,7 +66,11 @@ export default function CartMenu() {
       <View style={[styles.fullScreenContainer, { paddingTop: insets.top }]}>
         <View style={styles.header}>
           <TouchableOpacity onPress={closeCart} style={styles.closeButton}>
-            <AntDesign name="close" size={24} color={Theme.colors.primary} />
+            <Entypo
+              name="chevron-thin-left"
+              size={24}
+              color={Theme.colors.primary}
+            />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>CART</Text>
           <View style={{ width: 40 }} />
@@ -110,13 +83,8 @@ export default function CartMenu() {
             showsVerticalScrollIndicator={false}
             onScroll={scrollHandler}
             scrollEventThrottle={16}
-            onContentSizeChange={(_, h) => {
-              contentHeight.value = h;
-              contentMeasured.value = true;
-            }}
-            onLayout={(e) => {
-              scrollViewHeight.value = e.nativeEvent.layout.height;
-            }}
+            onContentSizeChange={(_, h) => onContentSizeChange(_, h)}
+            onLayout={(e) => onScrollViewLayout(e.nativeEvent.layout.height)}
           >
             {items.length === 0 ? (
               <View style={styles.emptyContainer} pointerEvents="none">
@@ -130,70 +98,13 @@ export default function CartMenu() {
               </View>
             ) : (
               items.map((item) => (
-                <View key={item.id} style={styles.cartItemRow}>
-                  <View style={styles.itemImageContainer}>
-                    {item.image ? (
-                      <Image source={item.image} style={styles.itemImage} />
-                    ) : (
-                      <View style={styles.imagePlaceholder}>
-                        <Ionicons
-                          name="shirt-outline"
-                          size={32}
-                          color={Theme.colors.grey[300]}
-                        />
-                      </View>
-                    )}
-                  </View>
-                  <View style={styles.itemInfo}>
-                    <View style={styles.itemHeader}>
-                      <Text style={styles.itemName}>{item.name}</Text>
-                      <TouchableOpacity
-                        onPress={() => handleRemoveConfirm(item.id, item.name)}
-                      >
-                        <Ionicons
-                          name="close-outline"
-                          size={24}
-                          color={Theme.colors.grey[400]}
-                        />
-                      </TouchableOpacity>
-                    </View>
-
-                    {item.description && (
-                      <Text style={styles.itemDescription} numberOfLines={2}>
-                        {item.description}
-                      </Text>
-                    )}
-
-                    <View style={styles.quantitySection}>
-                      <View style={styles.quantityControls}>
-                        <TouchableOpacity
-                          style={styles.circleBtn}
-                          onPress={() => updateQuantity(item.id, -1)}
-                        >
-                          <AntDesign
-                            name="minus"
-                            size={14}
-                            color={Theme.colors.primary}
-                          />
-                        </TouchableOpacity>
-                        <Text style={styles.quantityText}>{item.quantity}</Text>
-                        <TouchableOpacity
-                          style={styles.circleBtn}
-                          onPress={() => updateQuantity(item.id, 1)}
-                        >
-                          <AntDesign
-                            name="plus"
-                            size={14}
-                            color={Theme.colors.primary}
-                          />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-
-                    <Text style={styles.itemPrice}>
-                      {`$${Math.floor(item.price * item.quantity).toLocaleString()}`}
-                    </Text>
-                  </View>
+                <View key={`${item.id}-${item.selectedSize}`} style={{ paddingHorizontal: 20 }}>
+                  <CheckoutProductItem
+                    item={item}
+                    onUpdateQuantity={updateQuantity}
+                    showRemove={true}
+                    onRemove={(id, size) => handleRemoveConfirm(id, item.name, size)}
+                  />
                 </View>
               ))
             )}
@@ -201,9 +112,7 @@ export default function CartMenu() {
 
           <Animated.View
             style={[styles.scrollTrack, trackStyle]}
-            onLayout={(e) => {
-              trackHeightSV.value = e.nativeEvent.layout.height;
-            }}
+            onLayout={(e) => onTrackLayout(e.nativeEvent.layout.height)}
           >
             <Animated.View style={[styles.scrollThumb, indicatorStyle]} />
           </Animated.View>
@@ -232,12 +141,19 @@ export default function CartMenu() {
               styles.buyButton,
               { paddingBottom: Math.max(insets.bottom, 20), paddingTop: 20 },
             ]}
-            onPress={closeCart}
+            onPress={() => {
+              closeCart();
+              if (items.length === 0) {
+                router.push("/products");
+              } else {
+                router.push("/checkout");
+              }
+            }}
           >
             <Image
               source={Images.header.shoppingBag}
               style={styles.checkoutIcon}
-              tintColor="#fff"
+              tintColor={Theme.colors.white}
             />
             <Text style={styles.buyButtonText}>
               {items.length > 0 ? "BUY NOW" : "CONTINUE SHOPPING"}
@@ -252,18 +168,18 @@ export default function CartMenu() {
 const styles = StyleSheet.create({
   fullScreenContainer: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: Theme.colors.white,
   },
   header: {
     justifyContent: "flex-start",
-    gap: 15, // 간격 미세 조정
+    gap: 15,
     paddingHorizontal: 20,
-    paddingVertical: 10, // 상단으로 좀 더 밀착
+    paddingVertical: 10,
   },
   headerTitle: {
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.h3,
-    letterSpacing: 2,
+    letterSpacing: Theme.typography.letterSpacing.wider,
     color: Theme.colors.primary,
   },
   closeButton: {
@@ -301,98 +217,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 30,
-    paddingBottom: 100, // 시각적 중앙을 위해 위로 밀어올림
+    paddingBottom: 100,
     zIndex: -1,
   },
   emptyText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 28, // 더 크게 키움
+    fontSize: Theme.typography.fontSize.h2_md,
     color: Theme.colors.secondary,
     textAlign: "center",
     width: "100%",
-  },
-  cartItemRow: {
-    flexDirection: "row",
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: Theme.colors.grey[50],
-  },
-  itemImageContainer: {
-    width: 120, // 이미지 크기 확대
-    height: 150,
-    backgroundColor: Theme.colors.grey[50],
-    borderRadius: 4,
-    overflow: "hidden",
-  },
-  itemImage: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
-  },
-  imagePlaceholder: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  itemInfo: {
-    flex: 1,
-    marginLeft: 15,
-    justifyContent: "flex-start",
-    gap: 8, // 세로 요소간 간격
-  },
-  itemHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  itemName: {
-    fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 16,
-    color: Theme.colors.primary,
-    letterSpacing: 1,
-    flex: 1,
-    marginRight: 10,
-    fontWeight: "600",
-  },
-  itemDescription: {
-    fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 14,
-    color: Theme.colors.secondary,
-    lineHeight: 20,
-  },
-  quantitySection: {
-    marginTop: 5,
-  },
-  quantityControls: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10, // 간격 축소
-  },
-  circleBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: Theme.colors.grey[200],
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  quantityText: {
-    fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 14,
-    color: Theme.colors.primary,
-    minWidth: 20,
-    textAlign: "center",
-  },
-  itemPrice: {
-    fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 18,
-    color: Theme.colors.accent, // 주황색 적용
-    fontWeight: "700",
-    marginTop: 4,
   },
   checkoutContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: Theme.colors.white,
   },
   divider: {
     height: 1,
@@ -412,14 +248,14 @@ const styles = StyleSheet.create({
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.h4,
     color: Theme.colors.primary,
-    letterSpacing: 2,
+    letterSpacing: Theme.typography.letterSpacing.wider,
   },
   totalAmount: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: 20,
+    fontSize: Theme.typography.fontSize.h3,
     color: Theme.colors.accent,
     fontWeight: "700",
-    letterSpacing: 2,
+    letterSpacing: Theme.typography.letterSpacing.wider,
   },
   buyButton: {
     backgroundColor: Theme.colors.primary,
@@ -432,9 +268,9 @@ const styles = StyleSheet.create({
   },
   buyButtonText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: Theme.typography.fontSize.h3,
-    color: "#fff",
-    letterSpacing: 1,
+    fontSize: Theme.typography.fontSize.h4,
+    color: Theme.colors.white,
+    letterSpacing: Theme.typography.letterSpacing.wide,
     fontWeight: "600",
   },
   checkoutIcon: {
@@ -451,6 +287,6 @@ const styles = StyleSheet.create({
     fontSize: Theme.typography.fontSize.lg,
     color: Theme.colors.grey[500],
     textAlign: "left",
-    lineHeight: 24,
+    lineHeight: Theme.typography.lineHeight.fixed24,
   },
 });
