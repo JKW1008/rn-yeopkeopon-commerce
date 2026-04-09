@@ -45,6 +45,12 @@ export const Images = {
       jihyn2: require("@/assets/images/home/profile/jihyn2.png"),
     },
   },
+  productList: {
+    gridView: require("@/assets/images/productList/gridView.png"),
+    listView: require("@/assets/images/productList/listView.png"),
+    galleryView: require("@/assets/images/productList/galleryView.png"),
+    filter: require("@/assets/images/productList/filter.png"),
+  },
   productDetail: {
     bleach: require("@/assets/images/productDetail/bleach.png"),
     dry: require("@/assets/images/productDetail/dry.png"),
