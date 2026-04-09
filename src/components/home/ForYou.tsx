@@ -1,8 +1,9 @@
 import { Theme } from "@/src/constants/theme";
 import { Images } from "@/src/constants/theme/images";
-import { DUMMY_PRODUCTS } from "@/src/data/dummyProducts";
+import { DUMMY_PRODUCTS } from "@/src/data/dummyProductData";
 import { useRef, useState } from "react";
 import {
+  Dimensions,
   FlatList,
   Image,
   StyleSheet,
@@ -10,7 +11,10 @@ import {
   View,
   ViewToken,
 } from "react-native";
-import ProductCard from "../common/ProductCard";
+import ProductCard from "../products/ProductCard";
+
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const CARD_WIDTH = SCREEN_WIDTH * 0.75;
 
 export default function ForYou() {
   const carouselData = DUMMY_PRODUCTS.slice(4, 9);
@@ -49,11 +53,7 @@ export default function ForYou() {
         viewabilityConfig={viewabilityConfig}
         renderItem={({ item }) => (
           <View style={styles.cardWrapper}>
-            <ProductCard
-              product={item}
-              onPress={(id) => console.log("ForYou 상품 클릭됨:", id)}
-              isLarge={true}
-            />
+            <ProductCard product={item} variant="large" />
           </View>
         )}
       />
@@ -97,12 +97,11 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   cardWrapper: {
-    width: 250,
+    width: CARD_WIDTH,
   },
   indicatorContainer: {
     flexDirection: "row",
     alignSelf: "center",
-    marginTop: 30,
     gap: 12,
   },
   diamond: {

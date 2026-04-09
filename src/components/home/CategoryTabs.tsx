@@ -2,7 +2,7 @@ import { Theme } from "@/src/constants/theme";
 import { Images } from "@/src/constants/theme/images";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const CATEGORIES = ["All", "Apparel", "Dress", "Tshirt", "Bag"];
+const CATEGORIES = ["All", "Outer", "Dress", "Knitwear", "Bag", "Shoes"];
 
 interface CategoryTabsProps {
   activeTab: string;
@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     marginTop: 10,
     marginBottom: 10,
+    width: "100%",
   },
   titleContainer: {
     alignItems: "center",
@@ -64,13 +65,13 @@ const styles = StyleSheet.create({
   },
   tabContainer: {
     flexDirection: "row",
-    justifyContent: "center",
+    width: "100%",
+    justifyContent: "space-between",
     alignItems: "center",
-    gap: 24,
+    paddingHorizontal: 10,
   },
   tabItem: {
     alignItems: "center",
-    minWidth: 40,
   },
   tabText: {
     fontSize: Theme.typography.fontSize.md,
