@@ -151,7 +151,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   shippingOptionTitleActive: {
-    fontWeight: "700",
   },
   shippingDesc: {
     fontFamily: Theme.typography.fontFamily.main,

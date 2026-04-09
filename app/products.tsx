@@ -10,12 +10,14 @@ import { Theme } from "@/src/constants/theme";
 import { useViewStore } from "@/src/store/useViewStore";
 import { useProductFiltering } from "@/src/hooks/useProductFiltering";
 import { Product } from "@/src/data/dummyProductData";
-import { Ionicons } from "@expo/vector-icons";
+import Pagination from "@/src/components/common/Pagination";
+import SearchResultHeader from "@/src/components/search/SearchResultHeader";
 
 export default function ProductsScreen() {
   const params = useLocalSearchParams<{
     category?: string;
     subCategory?: string;
+    search?: string;
   }>();
 
   const { viewMode, toggleViewMode } = useViewStore();
@@ -32,6 +34,7 @@ export default function ProductsScreen() {
   } = useProductFiltering({
     initialCategory: params.category,
     initialSubCategory: params.subCategory,
+    searchQuery: params.search,
   });
 
   const renderItem = ({ item }: { item: Product }) => (
@@ -40,50 +43,12 @@ export default function ProductsScreen() {
 
   const ItemSeparator = () => <View style={{ height: 20 }} />;
 
-  const Pagination = () => {
-    if (totalPages <= 1) return null;
-
-    const pages = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pages.push(i);
-    }
-
-    return (
-      <View style={styles.paginationContainer}>
-        <TouchableOpacity 
-          style={styles.pageArrow} 
-          disabled={currentPage === 1}
-          onPress={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-        >
-          <Ionicons name="chevron-back" size={20} color={currentPage === 1 ? Theme.colors.grey[300] : Theme.colors.primary} />
-        </TouchableOpacity>
-
-        <View style={styles.pageNumbers}>
-          {pages.map((p) => (
-            <TouchableOpacity 
-              key={p} 
-              style={[styles.pageButton, currentPage === p && styles.activePageButton]}
-              onPress={() => setCurrentPage(p)}
-            >
-              <Text style={[styles.pageText, currentPage === p && styles.activePageText]}>{p}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <TouchableOpacity 
-          style={styles.pageArrow} 
-          disabled={currentPage === totalPages}
-          onPress={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-        >
-          <Ionicons name="chevron-forward" size={20} color={currentPage === totalPages ? Theme.colors.grey[300] : Theme.colors.primary} />
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <AppHeader />
+      
+      <SearchResultHeader query={params.search} />
+
       <FlatList
         key={viewMode === "grid" ? "grid-view" : "other-view"}
         data={displayedProducts}
@@ -99,6 +64,8 @@ export default function ProductsScreen() {
         ListHeaderComponent={
           <ProductHeader
             count={processedProducts.length}
+            searchQuery={params.search}
+            title={params.category || params.subCategory}
             viewMode={viewMode}
             onViewChange={toggleViewMode}
             activeChips={activeFilters.filter(f => f !== "All")}
@@ -111,7 +78,11 @@ export default function ProductsScreen() {
         }
         ListFooterComponent={
           <>
-            <Pagination />
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
             <AppFooter />
           </>
         }
@@ -169,7 +140,6 @@ const styles = StyleSheet.create({
   },
   activePageText: {
     color: Theme.colors.white,
-    fontWeight: "600",
   },
   pageArrow: {
     padding: 10,

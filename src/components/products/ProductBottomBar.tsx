@@ -71,7 +71,6 @@ const styles = StyleSheet.create({
     color: Theme.colors.white,
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.lg,
-    fontWeight: "600",
     letterSpacing: Theme.typography.letterSpacing.wide,
   },
 });

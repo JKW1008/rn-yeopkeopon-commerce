@@ -168,7 +168,6 @@ const styles = StyleSheet.create({
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.h4,
     color: Theme.colors.primary,
-    fontWeight: "700",
     lineHeight: Theme.typography.lineHeight.fixed28,
     marginBottom: 24,
     letterSpacing: Theme.typography.letterSpacing.wide,
@@ -182,7 +181,6 @@ const styles = StyleSheet.create({
   },
   highlight: {
     color: "#DD8560", // Screenshot highlight color
-    fontWeight: "600",
   },
   sectionImage: {
     width: width - 40,
@@ -256,6 +254,5 @@ const styles = StyleSheet.create({
   },
   backLink: {
     color: Theme.colors.primary,
-    fontWeight: "600",
   },
 });

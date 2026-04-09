@@ -96,7 +96,6 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: Theme.typography.fontFamily.boldHero,
     fontSize: 48,
-    fontWeight: "bold",
     color: "rgba(0, 0, 0, 0.7)",
     textAlign: "left",
     alignSelf: "flex-start",
@@ -121,7 +120,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: Theme.typography.fontSize.md,
     letterSpacing: Theme.typography.letterSpacing.wide,
-    fontWeight: "500",
   },
   indicatorContainer: {
     position: "absolute",

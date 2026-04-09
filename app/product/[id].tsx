@@ -13,7 +13,7 @@ import { Images } from "@/src/constants/theme/images";
 import { DUMMY_PRODUCTS } from "@/src/data/dummyProductData";
 import { useAddToCart } from "@/src/hooks/useAddToCart";
 import { useProductWishlist } from "@/src/hooks/useProductWishlist";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Dimensions,
@@ -67,10 +67,21 @@ const SHIPPING_ITEMS = [
   },
 ];
 
+import { useCartStore } from "@/src/store/useCartStore";
+
 export default function ProductDetailScreen() {
   const insets = useSafeAreaInsets();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
+  const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
   const product = DUMMY_PRODUCTS.find((p) => p.id === id);
+  const openCart = useCartStore((state) => state.openCart);
+
+  const handleBack = () => {
+    router.back();
+    if (from === "cart") {
+      openCart();
+    }
+  };
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -99,7 +110,7 @@ export default function ProductDetailScreen() {
   if (!product) {
     return (
       <View style={[styles.container, { paddingTop: insets.top }]}>
-        <AppHeader showBack={true} />
+        <AppHeader showBack={true} onBack={handleBack} />
         <View style={styles.center}>
           <Text>Product not found.</Text>
         </View>
@@ -120,7 +131,7 @@ export default function ProductDetailScreen() {
       <View
         style={{ paddingTop: insets.top, backgroundColor: Theme.colors.white }}
       >
-        <AppHeader showBack={true} />
+        <AppHeader showBack={true} onBack={handleBack} />
       </View>
 
       <ScrollView

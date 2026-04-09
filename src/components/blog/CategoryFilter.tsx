@@ -75,7 +75,6 @@ const styles = StyleSheet.create({
   },
   activeText: {
     color: "#fff",
-    fontWeight: "600",
   },
   activeDot: {
     display: "none",

@@ -143,7 +143,6 @@ const styles = StyleSheet.create({
     letterSpacing: Theme.typography.letterSpacing.wider,
     marginBottom: 4,
     textTransform: "uppercase",
-    fontWeight: "600",
   },
   nameText: {
     fontFamily: Theme.typography.fontFamily.main,
@@ -179,7 +178,7 @@ const styles = StyleSheet.create({
   },
   // Grid Styles
   gridContainer: {
-    width: "49%",
+    width: "48%",
   },
   gridImage: {
     width: "100%",

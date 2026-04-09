@@ -1,20 +1,28 @@
 import { Theme } from "@/src/constants/theme";
+import { Images } from "@/src/constants/theme/images";
 import { PRODUCT_CATEGORIES } from "@/src/data/dummyProductData";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
+  Image,
+  Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  ScrollView,
-  Modal,
 } from "react-native";
-import { Ionicons, Feather } from "@expo/vector-icons";
 
-export type SortOption = "New" | "Price: Low to High" | "Price: High to Low" | "Rating";
+export type SortOption =
+  | "New"
+  | "Price: Low to High"
+  | "Price: High to Low"
+  | "Rating";
 
 interface ProductHeaderProps {
   count: number;
+  title?: string;
+  searchQuery?: string;
   onViewChange: () => void;
   viewMode: "grid" | "list" | "large";
   activeChips?: string[];
@@ -34,6 +42,8 @@ const SORT_OPTIONS: SortOption[] = [
 
 export default function ProductHeader({
   count,
+  title,
+  searchQuery,
   onViewChange,
   viewMode,
   activeChips = [],
@@ -46,37 +56,59 @@ export default function ProductHeader({
   const [showSortModal, setShowSortModal] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
 
-  const getViewIcon = () => {
-    switch (viewMode) {
-      case "grid": return "grid";
-      case "list": return "list";
-      case "large": return "square";
-      default: return "grid";
-    }
-  };
+  const headerTitle = searchQuery || title || "APPAREL";
 
   return (
     <View style={styles.container}>
       <View style={styles.topRow}>
-        <Text style={styles.countText}>{`${count} APPAREL`}</Text>
+        <Text style={styles.countText}>
+          {count} {headerTitle.toUpperCase()}
+        </Text>
         <View style={styles.actions}>
           <TouchableOpacity
             style={styles.sortPill}
             onPress={() => setShowSortModal(true)}
           >
             <Text style={styles.sortText}>{sortOption.split(":")[0]}</Text>
-            <Ionicons name="chevron-down" size={14} color={Theme.colors.grey[500]} />
+            <Ionicons
+              name="chevron-down"
+              size={14}
+              color={Theme.colors.grey[500]}
+            />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.iconButton} onPress={onViewChange}>
-            <Feather name={getViewIcon()} size={20} color={Theme.colors.primary} />
+            <Image
+              source={
+                viewMode === "grid"
+                  ? Images.productList.gridView
+                  : viewMode === "list"
+                    ? Images.productList.listView
+                    : Images.productList.galleryView
+              }
+              style={styles.actionIcon}
+              resizeMode="contain"
+            />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.iconButton, styles.filterButton]}
             onPress={() => setShowFilterModal(true)}
           >
-            <Ionicons name="filter-outline" size={24} color={Theme.colors.accent} />
+            <View style={styles.filterIconCircle}>
+              <Image
+                source={Images.productList.filter}
+                style={[
+                  styles.actionIconSmall,
+                  {
+                    tintColor: activeFilters.some((f) => f !== "All")
+                      ? Theme.colors.accent
+                      : Theme.colors.accent, // Matching image color
+                  },
+                ]}
+                resizeMode="contain"
+              />
+            </View>
           </TouchableOpacity>
         </View>
       </View>
@@ -132,7 +164,11 @@ export default function ProductHeader({
                   {option}
                 </Text>
                 {sortOption === option && (
-                  <Ionicons name="checkmark" size={16} color={Theme.colors.primary} />
+                  <Ionicons
+                    name="checkmark"
+                    size={16}
+                    color={Theme.colors.primary}
+                  />
                 )}
               </TouchableOpacity>
             ))}
@@ -152,7 +188,10 @@ export default function ProductHeader({
           activeOpacity={1}
           onPress={() => setShowFilterModal(false)}
         >
-          <View style={styles.filterSheet} onStartShouldSetResponder={() => true}>
+          <View
+            style={styles.filterSheet}
+            onStartShouldSetResponder={() => true}
+          >
             <View style={styles.filterHandle} />
             <Text style={styles.filterTitle}>{`FILTER BY CATEGORY`}</Text>
             <View style={styles.filterGrid}>
@@ -170,7 +209,8 @@ export default function ProductHeader({
                   <Text
                     style={[
                       styles.filterChipText,
-                      activeFilters.includes(cat) && styles.filterChipTextActive,
+                      activeFilters.includes(cat) &&
+                        styles.filterChipTextActive,
                     ]}
                   >
                     {cat}
@@ -190,13 +230,12 @@ const styles = StyleSheet.create({
     backgroundColor: Theme.colors.white,
     paddingTop: 10,
     paddingBottom: 10,
-    marginBottom: 20,
   },
   topRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 5,
     height: 50,
   },
   countText: {
@@ -208,32 +247,48 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 8,
   },
   sortPill: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: Theme.colors.surface,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     borderRadius: 20,
-    gap: 4,
+    gap: 6,
+  },
+  filterIconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Theme.colors.surface,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  actionIconSmall: {
+    width: 22,
+    height: 22,
   },
   sortText: {
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.base,
-    color: Theme.colors.primary,
+    color: Theme.colors.secondary,
   },
   iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: Theme.colors.surface,
     justifyContent: "center",
     alignItems: "center",
   },
   filterButton: {
-    backgroundColor: "#FCF6F3",
+    backgroundColor: Theme.colors.surface,
+  },
+  actionIcon: {
+    width: 22,
+    height: 22,
   },
   filterButtonActive: {
     backgroundColor: "#F5E6DD",
@@ -304,7 +359,6 @@ const styles = StyleSheet.create({
   },
   sortOptionActive: {
     color: Theme.colors.primary,
-    fontWeight: "600",
   },
   filterOverlay: {
     flex: 1,
@@ -356,6 +410,5 @@ const styles = StyleSheet.create({
   },
   filterChipTextActive: {
     color: Theme.colors.white,
-    fontWeight: "600",
   },
 });

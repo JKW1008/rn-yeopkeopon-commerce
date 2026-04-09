@@ -22,6 +22,8 @@ interface OrderSummaryStepProps {
   onBackToList: () => void;
 }
 
+import { useRouter } from "expo-router";
+
 const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
   orderId,
   orderedItems,
@@ -31,6 +33,11 @@ const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
   onBackToList,
 }) => {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+
+  const handleProductPress = (id: string) => {
+    router.push(`/product/${id}`);
+  };
 
   return (
     <Animated.View entering={FadeInRight} style={{ flex: 1 }}>
@@ -92,12 +99,14 @@ const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
 
             <Text style={styles.summaryH4Title}>ITEMS</Text>
             {orderedItems.map((item) => (
-              <View
-                key={`${item.id}-${item.selectedSize}`}
+              <TouchableOpacity
+                key={`${item.id}-${item.selectedSize}-${item.selectedColor}`}
                 style={[
                   styles.summaryItem,
                   { paddingHorizontal: 0, marginBottom: 25 },
                 ]}
+                onPress={() => handleProductPress(item.id)}
+                activeOpacity={0.7}
               >
                 <Image source={item.image} style={styles.summaryImage} />
                 <View style={styles.itemInfo}>
@@ -120,7 +129,7 @@ const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
                     ${(item.price * item.quantity).toLocaleString()}
                   </Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
         </ScrollView>
@@ -177,7 +186,6 @@ const styles = StyleSheet.create({
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.md,
     color: Theme.colors.primary,
-    fontWeight: "bold",
     marginBottom: 8,
   },
   orderIdValue: {
@@ -236,7 +244,6 @@ const styles = StyleSheet.create({
   confirmItemBrand: {
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.md,
-    fontWeight: "bold",
     color: Theme.colors.primary,
   },
   itemName: {
@@ -289,7 +296,6 @@ const styles = StyleSheet.create({
     color: Theme.colors.white,
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.lg,
-    fontWeight: "600",
     letterSpacing: Theme.typography.letterSpacing.wider,
   },
 });

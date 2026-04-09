@@ -44,7 +44,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: Theme.typography.fontSize.h2_md,
-    fontWeight: "700",
     color: Theme.colors.primary,
     marginBottom: 10,
     textAlign: "center",

@@ -157,7 +157,6 @@ const styles = StyleSheet.create({
     fontSize: Theme.typography.fontSize.h4,
     color: "#fff",
     lineHeight: 28,
-    fontWeight: "600",
     letterSpacing: 0.5,
   },
   metaContainer: {
@@ -211,7 +210,6 @@ const styles = StyleSheet.create({
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: 16,
     color: Theme.colors.primary,
-    fontWeight: "600",
     marginBottom: 6,
     lineHeight: 20,
   },

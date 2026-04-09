@@ -52,15 +52,17 @@ export default function AppHeader({
             </TouchableOpacity>
           ))}
       </View>
-      <Image
-        source={Images.header.logo}
-        style={styles.logoImage}
-        resizeMode="contain"
-      />
+      <TouchableOpacity onPress={() => router.push("/")}>
+        <Image
+          source={Images.header.logo}
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
+      </TouchableOpacity>
       <View style={[styles.sideArea, { justifyContent: "flex-end" }]}>
         {!hideIcons && (
           <View style={styles.rightActions}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push({ pathname: "/search", params: { from: "home" } })}>
               <Image
                 source={Images.header.search}
                 style={styles.headerIcons}

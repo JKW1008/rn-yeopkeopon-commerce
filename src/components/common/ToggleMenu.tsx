@@ -1,6 +1,7 @@
 import { Theme } from "@/src/constants/theme";
 import { Images } from "@/src/constants/theme/images";
 import { useMenuStore } from "@/src/store/useMenuStore";
+import { useFilterStore } from "@/src/store/useFilterStore";
 import { useAnimatedScrollbar } from "@/src/hooks/useAnimatedScrollbar";
 import TitleUnderline from "@/src/components/common/TitleUnderline";
 import { AntDesign, Feather } from "@expo/vector-icons";
@@ -60,17 +61,16 @@ const CATEGORIES = [
 
 export default function ToggleMenu() {
   const { isOpen, closeMenu } = useMenuStore();
+  const { setFilters } = useFilterStore();
   const [activeTab, setActiveTab] = useState("WOMEN");
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
   const handleNavigate = (category: string, subCategory?: string) => {
+    setFilters([subCategory ?? category]);
     closeMenu();
-    router.push({
-      pathname: "/products",
-      params: { category, subCategory: subCategory ?? "" },
-    });
+    router.push("/products");
   };
 
   const {
