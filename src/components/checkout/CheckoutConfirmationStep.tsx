@@ -10,12 +10,14 @@ import Animated, {
 import TitleUnderline from "../common/TitleUnderline";
 import CheckoutProductItem from "./CheckoutProductItem";
 
+import { useRouter } from "expo-router";
+
 interface CheckoutConfirmationStepProps {
   items: any[];
   selectedAddress: Address;
   selectedShipping: string;
   direction: "forward" | "backward";
-  updateQuantity: (id: string, delta: number, size?: string) => void;
+  onUpdateQuantity: (id: string, delta: number, size?: string) => void;
 }
 
 const CheckoutConfirmationStep: React.FC<CheckoutConfirmationStepProps> = ({
@@ -23,8 +25,14 @@ const CheckoutConfirmationStep: React.FC<CheckoutConfirmationStepProps> = ({
   selectedAddress,
   selectedShipping,
   direction,
-  updateQuantity,
+  onUpdateQuantity,
 }) => {
+  const router = useRouter();
+
+  const handleProductPress = (id: string) => {
+    router.push(`/product/${id}`);
+  };
+
   return (
     <Animated.View
       entering={direction === "forward" ? FadeInRight : FadeInLeft}
@@ -102,9 +110,10 @@ const CheckoutConfirmationStep: React.FC<CheckoutConfirmationStepProps> = ({
           <View style={styles.confirmationItems}>
             {items.map((item) => (
               <CheckoutProductItem
-                key={`${item.id}-${item.selectedSize}`}
+                key={`${item.id}-${item.selectedSize}-${item.selectedColor}`}
                 item={item}
-                onUpdateQuantity={updateQuantity}
+                onUpdateQuantity={onUpdateQuantity}
+                onPress={() => handleProductPress(item.id)}
               />
             ))}
           </View>
@@ -169,7 +178,6 @@ const styles = StyleSheet.create({
   setupName: {
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.lg,
-    fontWeight: "600",
     color: Theme.colors.primary,
     marginBottom: 4,
   },

@@ -2,7 +2,8 @@ import AppHeader from "@/src/components/ui/AppHeader";
 import { Theme } from "@/src/constants/theme";
 import { Images } from "@/src/constants/theme/images";
 import { useCheckout } from "@/src/hooks/useCheckout";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useCartStore } from "@/src/store/useCartStore";
 import React from "react";
 import {
   ActivityIndicator,
@@ -37,6 +38,8 @@ const AnimatedTouchableOpacity =
 export default function CheckoutScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { from } = useLocalSearchParams<{ from?: string }>();
+  const openCart = useCartStore((state) => state.openCart);
   
   const {
     currentStep,
@@ -74,6 +77,15 @@ export default function CheckoutScreen() {
     items,
     updateQuantity,
   } = useCheckout();
+
+  const customHandleBack = () => {
+    if (from === "cart" && currentStep === "summary") {
+      router.back();
+      openCart();
+    } else {
+      handleBack();
+    }
+  };
 
   const getButtonText = () => {
     switch (currentStep) {
@@ -130,7 +142,7 @@ export default function CheckoutScreen() {
           <View style={{ paddingTop: insets.top }}>
             <AppHeader
               showBack={true}
-              onBack={handleBack}
+              onBack={customHandleBack}
             />
             <View style={styles.progressBarContainer}>
               <Animated.View style={[styles.progressBar, progressStyle]} />
@@ -203,6 +215,7 @@ export default function CheckoutScreen() {
           selectedPayment={selectedPayment}
           direction={direction}
           selectedShipping={selectedShipping}
+          onUpdateQuantity={updateQuantity}
         />
       )}
 
@@ -314,7 +327,6 @@ const styles = StyleSheet.create({
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.h3,
     color: Theme.colors.accent,
-    fontWeight: "700",
     letterSpacing: Theme.typography.letterSpacing.wider,
   },
   checkoutBtn: {
@@ -336,7 +348,6 @@ const styles = StyleSheet.create({
     color: Theme.colors.white,
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.lg,
-    fontWeight: "600",
     letterSpacing: Theme.typography.letterSpacing.wider,
   },
 });

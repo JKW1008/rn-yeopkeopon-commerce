@@ -19,19 +19,27 @@ import Animated, {
 } from "react-native-reanimated";
 import TitleUnderline from "../common/TitleUnderline";
 
+import { useRouter } from "expo-router";
+
 const { width } = Dimensions.get("window");
 
 interface CheckoutSummaryStepProps {
   items: any[];
   direction: "forward" | "backward";
-  updateQuantity: (id: string, delta: number, size?: string) => void;
+  onUpdateQuantity: (id: string, delta: number, size?: string) => void;
 }
 
 const CheckoutSummaryStep: React.FC<CheckoutSummaryStepProps> = ({
   items,
   direction,
-  updateQuantity,
+  onUpdateQuantity,
 }) => {
+  const router = useRouter();
+
+  const handleProductPress = (id: string) => {
+    router.push(`/product/${id}`);
+  };
+
   return (
     <Animated.View
       entering={direction === "forward" ? FadeInRight : FadeInLeft}
@@ -50,9 +58,10 @@ const CheckoutSummaryStep: React.FC<CheckoutSummaryStepProps> = ({
           </View>
           {items.map((item) => (
             <CheckoutProductItem
-              key={`${item.id}-${item.selectedSize}`}
+              key={`${item.id}-${item.selectedSize}-${item.selectedColor}`}
               item={item}
-              onUpdateQuantity={updateQuantity}
+              onUpdateQuantity={onUpdateQuantity}
+              onPress={() => handleProductPress(item.id)}
             />
           ))}
 

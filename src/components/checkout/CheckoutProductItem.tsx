@@ -30,6 +30,7 @@ interface CheckoutProductItemProps {
     color?: string,
   ) => void;
   onRemove?: (id: string, size?: string, color?: string) => void;
+  onPress?: () => void;
   showRemove?: boolean;
 }
 
@@ -37,14 +38,28 @@ const CheckoutProductItem: React.FC<CheckoutProductItemProps> = ({
   item,
   onUpdateQuantity,
   onRemove,
+  onPress,
   showRemove = false,
 }) => {
   return (
     <View style={styles.container}>
-      <Image source={item.image} style={styles.image} />
+      <TouchableOpacity
+        style={styles.touchableArea}
+        onPress={onPress}
+        activeOpacity={0.7}
+      >
+        <Image source={item.image} style={styles.image} />
+      </TouchableOpacity>
+      
       <View style={styles.itemInfo}>
         <View style={styles.itemHeader}>
-          <Text style={styles.brand}>{item.brand || "LAMEREI"}</Text>
+          <TouchableOpacity 
+            style={{ flex: 1 }} 
+            onPress={onPress}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.brand}>{item.brand || "LAMEREI"}</Text>
+          </TouchableOpacity>
           {showRemove && onRemove && (
             <TouchableOpacity
               onPress={() =>
@@ -60,13 +75,18 @@ const CheckoutProductItem: React.FC<CheckoutProductItemProps> = ({
             </TouchableOpacity>
           )}
         </View>
-        <Text style={styles.name}>{item.name}</Text>
+        <TouchableOpacity 
+          onPress={onPress}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.name}>{item.name}</Text>
+        </TouchableOpacity>
 
         {(item.selectedSize || item.selectedColor) && (
           <Text style={styles.optionText}>
-            {item.selectedSize ? `SIZE: ${item.selectedSize}` : ""}
-            {item.selectedSize && item.selectedColor ? " / " : ""}
-            {item.selectedColor ? `COLOR: ${item.selectedColor}` : ""}
+            {item.selectedSize || ""}
+            {item.selectedSize && item.selectedColor ? " | " : ""}
+            {item.selectedColor || ""}
           </Text>
         )}
 
@@ -113,6 +133,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: 25,
   },
+  touchableArea: {
+    flex: 0,
+  },
   image: {
     width: width * 0.3,
     height: width * 0.4,
@@ -132,7 +155,6 @@ const styles = StyleSheet.create({
   brand: {
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.base,
-    fontWeight: "400",
     color: Theme.colors.primary,
     textTransform: "uppercase",
     marginBottom: 4,
@@ -182,7 +204,6 @@ const styles = StyleSheet.create({
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.lg,
     color: Theme.colors.accent,
-    fontWeight: "600",
     letterSpacing: Theme.typography.letterSpacing.wide,
   },
 });

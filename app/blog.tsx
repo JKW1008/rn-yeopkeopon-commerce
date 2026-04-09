@@ -98,7 +98,6 @@ const styles = StyleSheet.create({
     fontSize: Theme.typography.fontSize.h2,
     color: Theme.colors.primary,
     letterSpacing: Theme.typography.letterSpacing.extraWide,
-    fontWeight: "600",
   },
   filterBar: {
     flexDirection: "row",
@@ -127,7 +126,6 @@ const styles = StyleSheet.create({
     fontSize: Theme.typography.fontSize.lg,
     color: Theme.colors.primary,
     letterSpacing: Theme.typography.letterSpacing.wide,
-    fontWeight: "600",
   },
   scrollContent: {
     flexGrow: 1,

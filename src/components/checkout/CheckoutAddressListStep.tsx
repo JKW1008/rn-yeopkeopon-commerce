@@ -170,7 +170,6 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.lg,
-    fontWeight: "600",
     color: Theme.colors.primary,
   },
   addressMain: {
