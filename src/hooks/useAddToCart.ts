@@ -1,5 +1,5 @@
 import { useCartStore } from "@/src/store/useCartStore";
-import { Product } from "@/src/data/dummyProductData";
+import { Product } from "@/src/api/types";
 import * as Haptics from "expo-haptics";
 import { Alert } from "react-native";
 

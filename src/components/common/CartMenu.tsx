@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useCallback } from "react";
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CheckoutProductItem from "../checkout/CheckoutProductItem";
@@ -29,20 +30,21 @@ export default function CartMenu() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
-  const handleRemoveConfirm = (id: string, name: string, size?: string) => {
+  const handleRemoveConfirm = useCallback((id: string, name: string, size?: string, color?: string) => {
+    const optionsText = [size, color].filter(Boolean).join(" / ");
     Alert.alert(
       "REMOVE ITEM",
-      `Are you sure you want to remove ${name}${size ? ` (${size})` : ""} from your shopping bag?`,
+      `Are you sure you want to remove ${name}${optionsText ? ` (${optionsText})` : ""} from your shopping bag?`,
       [
         { text: "CANCEL", style: "cancel" },
         {
           text: "REMOVE",
-          onPress: () => removeItem(id, size),
+          onPress: () => removeItem(id),
           style: "destructive",
         },
       ],
     );
-  };
+  }, [removeItem]);
 
   const {
     scrollHandler,
@@ -53,10 +55,13 @@ export default function CartMenu() {
     onTrackLayout,
   } = useAnimatedScrollbar();
 
-  const handleItemPress = (id: string) => {
+  const handleItemPress = useCallback((id: string) => {
     closeCart();
-    router.push({ pathname: `/product/${id}`, params: { from: "cart" } });
-  };
+    router.push({
+      pathname: "/product/[id]",
+      params: { id, from: "cart" }
+    } as any);
+  }, [closeCart, router]);
 
   return (
     <Modal
@@ -109,9 +114,9 @@ export default function CartMenu() {
                     onUpdateQuantity={updateQuantity}
                     showRemove={true}
                     onRemove={(id, size, color) =>
-                      handleRemoveConfirm(id, item.name, size, color)
+                      handleRemoveConfirm(id, item.product.name, size, color)
                     }
-                    onPress={() => handleItemPress(item.id)}
+                    onPress={() => handleItemPress(item.productId)}
                   />
                 </View>
               ))
@@ -154,7 +159,10 @@ export default function CartMenu() {
               if (items.length === 0) {
                 router.push("/products");
               } else {
-                router.push({ pathname: "/checkout", params: { from: "cart" } });
+                router.push({
+                  pathname: "/checkout",
+                  params: { from: "cart" },
+                });
               }
             }}
           >

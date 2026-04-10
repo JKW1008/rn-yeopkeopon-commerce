@@ -1,80 +1,95 @@
 import { create } from "zustand";
-import { DUMMY_PRODUCTS } from "../data/dummyProductData";
-
-export interface CartItem {
-  id: string;
-  name: string;
-  brand: string;
-  subTitle?: string;
-  description?: string;
-  price: number;
-  quantity: number;
-  image: any;
-  selectedSize?: string;
-  selectedColor?: string;
-}
+import { orderService } from "../api/services/orderService";
+import { CartItem } from "../api/types";
 
 interface CartState {
   isOpen: boolean;
   items: CartItem[];
+  isLoading: boolean;
   openCart: () => void;
   closeCart: () => void;
-  addItem: (item: CartItem) => void;
-  removeItem: (id: string, size?: string, color?: string) => void;
-  updateQuantity: (id: string, delta: number, size?: string, color?: string) => void;
+  fetchCart: () => Promise<void>;
+  addItem: (item: Omit<CartItem, "id" | "product">) => Promise<void>;
+  removeItem: (id: string) => Promise<void>;
+  updateQuantity: (id: string, delta: number) => Promise<void>;
   getTotalPrice: () => number;
-  clearCart: () => void;
+  clearCart: () => Promise<void>;
 }
 
 export const useCartStore = create<CartState>((set, get) => ({
   isOpen: false,
   items: [],
+  isLoading: false,
   openCart: () => set({ isOpen: true }),
   closeCart: () => set({ isOpen: false }),
-  addItem: (item) =>
-    set((state) => {
-      const existingItem = state.items.find(
-        (i) =>
-          i.id === item.id &&
-          (i.selectedSize || "") === (item.selectedSize || "") &&
-          (i.selectedColor || "") === (item.selectedColor || "")
-      );
-      if (existingItem) {
-        return {
-          items: state.items.map((i) =>
-            i.id === item.id &&
-            (i.selectedSize || "") === (item.selectedSize || "") &&
-            (i.selectedColor || "") === (item.selectedColor || "")
-              ? { ...i, quantity: i.quantity + item.quantity }
-              : i
-          ),
-        };
-      }
-      return { items: [...state.items, item] };
-    }),
-  removeItem: (id, size, color) =>
-    set((state) => ({
-      items: state.items.filter(
-        (i) =>
-          !(
-            i.id === id &&
-            (i.selectedSize || "") === (size || "") &&
-            (i.selectedColor || "") === (color || "")
-          )
-      ),
-    })),
-  updateQuantity: (id, delta, size, color) =>
-    set((state) => ({
-      items: state.items.map((i) =>
-        i.id === id &&
-        (i.selectedSize || "") === (size || "") &&
-        (i.selectedColor || "") === (color || "")
-          ? { ...i, quantity: Math.max(1, i.quantity + delta) }
-          : i
-      ),
-    })),
-  getTotalPrice: () => {
-    return get().items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  fetchCart: async () => {
+    set({ isLoading: true });
+    try {
+      const formattedItems = await orderService.getCartItems();
+      set({ items: formattedItems });
+    } catch (error) {
+    } finally {
+      set({ isLoading: false });
+    }
   },
-  clearCart: () => set({ items: [] }),
+
+  addItem: async (item) => {
+    set({ isLoading: true });
+    try {
+      await orderService.upsertCartItem({
+        productId: item.productId,
+        quantity: item.quantity,
+        selectedSize: item.selectedSize,
+        selectedColor: item.selectedColor,
+      });
+      await get().fetchCart();
+    } catch (error) {
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  removeItem: async (id) => {
+    try {
+      await orderService.deleteCartItem(id);
+      set((state) => ({
+        items: state.items.filter((i) => i.id !== id),
+      }));
+    } catch (error) {
+    }
+  },
+
+  updateQuantity: async (id, delta) => {
+    const item = get().items.find((i) => i.id === id);
+    if (!item) return;
+
+    const newQuantity = Math.max(1, item.quantity + delta);
+    try {
+      await orderService.upsertCartItem({
+        productId: item.productId,
+        quantity: newQuantity,
+        selectedSize: item.selectedSize,
+        selectedColor: item.selectedColor,
+      });
+      set((state) => ({
+        items: state.items.map((i) =>
+          i.id === id ? { ...i, quantity: newQuantity } : i
+        ),
+      }));
+    } catch (error) {
+    }
+  },
+
+  getTotalPrice: () => {
+    return get().items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  },
+
+  clearCart: async () => {
+    try {
+      await orderService.clearCart();
+      set({ items: [] });
+    } catch (error) {
+    }
+  },
 }));
