@@ -4,7 +4,7 @@ import Animated, { FadeInLeft, FadeInRight, FadeOutLeft, FadeOutRight } from 're
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { Theme } from "@/src/constants/theme";
 import { Images } from "@/src/constants/theme/images";
-import { PaymentMethod } from "@/src/hooks/useCheckout";
+import { PaymentMethod } from "@/src/api/types";
 
 interface CheckoutPaymentListStepProps {
   paymentMethods: PaymentMethod[];
@@ -64,13 +64,12 @@ const CheckoutPaymentListStep: React.FC<CheckoutPaymentListStepProps> = ({
                   <Text style={styles.paymentName}>{pm.brand}</Text>
                 </View>
                 <View style={styles.paymentMain}>
-                  <Text style={styles.paymentText}>{pm.number}</Text>
+                  <Text style={styles.paymentText}>•••• {pm.lastFour}</Text>
                 </View>
               </TouchableOpacity>
             ))}
           </View>
 
-          {/* Moved inside ScrollView */}
           <View style={styles.addPaymentInnerContainer}>
             <TouchableOpacity
               style={styles.addPaymentBtn}

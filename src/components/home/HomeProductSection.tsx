@@ -1,31 +1,49 @@
+import { productService } from "@/src/api/services/productService";
+import { Product } from "@/src/api/types";
 import { Theme } from "@/src/constants/theme";
-import { Product } from "@/src/data/dummyProductData";
 import { Feather } from "@expo/vector-icons";
-import { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import ProductCard from "../products/ProductCard";
-import CategoryTabs from "./CategoryTabs";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import CategoryTabs from "./CategoryTabs";
+import ProductCard from "../products/ProductCard";
 
-export default function HomeProductSection({
-  products,
-}: {
-  products: Product[];
-}) {
+export default function HomeProductSection() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("All");
+  const [tabProducts, setTabProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const displayProducts = products
-    .filter((p) => activeTab === "All" || p.category === activeTab)
-    .slice(0, 4);
+  useEffect(() => {
+    const fetchTabProducts = async () => {
+      setIsLoading(true);
+      try {
+        const data = await productService.getProducts({
+          category: activeTab === "All" ? undefined : activeTab,
+          limit: 4,
+        });
+        setTabProducts(data);
+      } catch {
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTabProducts();
+  }, [activeTab]);
 
   return (
     <View style={styles.container}>
       <View style={styles.tabWrapper}>
         <CategoryTabs activeTab={activeTab} onTabChange={setActiveTab} />
       </View>
-      <View style={styles.grid}>
-        {displayProducts.map((item) => (
+      <View style={[styles.grid, isLoading && { opacity: 0.5 }]}>
+        {isLoading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator color={Theme.colors.accent} />
+          </View>
+        )}
+        {tabProducts.map((item) => (
           <ProductCard
             key={item.id}
             product={item}
@@ -60,6 +78,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     marginTop: 10,
+    minHeight: 200,
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 100,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+    zIndex: 1,
   },
   cardWrapper: {
     width: "48%",

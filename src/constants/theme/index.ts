@@ -1,25 +1,27 @@
+import { scale, vs } from "../../utils/responsive";
 import { Colors } from './colors';
 import { Typography } from './typography';
 
 export const Theme = {
   colors: Colors,
   typography: Typography,
-  
+
   spacing: {
-    xs: 4,
-    sm: 8,
-    md: 16,
-    lg: 24,
-    xl: 32,
-    gutter: 16,
+    xs:     scale(4),
+    sm:     scale(8),
+    md:     scale(16),
+    lg:     scale(24),
+    xl:     scale(32),
+    gutter: scale(20),
   },
 
   borderRadius: {
     none: 0,
-    sm: 4,
-    md: 8,
-    lg: 16,
-  }
+    sm:   scale(4),
+    md:   scale(8),
+    lg:   scale(16),
+  },
 };
 
+export { scale, vs };
 export default Theme;

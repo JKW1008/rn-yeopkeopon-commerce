@@ -5,14 +5,14 @@ import { Ionicons } from "@expo/vector-icons";
 
 interface ShippingMethodModalProps {
   visible: boolean;
-  selectedShipping: string;
+  selectedMethod: string;
   onSelect: (method: string) => void;
   onClose: () => void;
 }
 
 const ShippingMethodModal: React.FC<ShippingMethodModalProps> = ({
   visible,
-  selectedShipping,
+  selectedMethod,
   onSelect,
   onClose,
 }) => {
@@ -37,7 +37,7 @@ const ShippingMethodModal: React.FC<ShippingMethodModalProps> = ({
           <TouchableOpacity
             style={[
               styles.shippingOption,
-              selectedShipping === "pickup" && styles.shippingOptionActive,
+              selectedMethod === "pickup" && styles.shippingOptionActive,
             ]}
             onPress={() => onSelect("pickup")}
           >
@@ -45,7 +45,7 @@ const ShippingMethodModal: React.FC<ShippingMethodModalProps> = ({
               <Text
                 style={[
                   styles.shippingOptionTitle,
-                  selectedShipping === "pickup" &&
+                  selectedMethod === "pickup" &&
                     styles.shippingOptionTitleActive,
                 ]}
               >
@@ -55,12 +55,12 @@ const ShippingMethodModal: React.FC<ShippingMethodModalProps> = ({
             </View>
             <Ionicons
               name={
-                selectedShipping === "pickup"
+                selectedMethod === "pickup"
                   ? "radio-button-on"
                   : "radio-button-off"
               }
               size={20}
-              color={selectedShipping === "pickup" ? Theme.colors.accent : Theme.colors.grey[500]}
+              color={selectedMethod === "pickup" ? Theme.colors.accent : Theme.colors.grey[500]}
             />
           </TouchableOpacity>
 
@@ -69,7 +69,7 @@ const ShippingMethodModal: React.FC<ShippingMethodModalProps> = ({
           <TouchableOpacity
             style={[
               styles.shippingOption,
-              selectedShipping === "delivery" && styles.shippingOptionActive,
+              selectedMethod === "delivery" && styles.shippingOptionActive,
             ]}
             onPress={() => onSelect("delivery")}
           >
@@ -77,7 +77,7 @@ const ShippingMethodModal: React.FC<ShippingMethodModalProps> = ({
               <Text
                 style={[
                   styles.shippingOptionTitle,
-                  selectedShipping === "delivery" &&
+                  selectedMethod === "delivery" &&
                     styles.shippingOptionTitleActive,
                 ]}
               >
@@ -89,12 +89,12 @@ const ShippingMethodModal: React.FC<ShippingMethodModalProps> = ({
             </View>
             <Ionicons
               name={
-                selectedShipping === "delivery"
+                selectedMethod === "delivery"
                   ? "radio-button-on"
                   : "radio-button-off"
               }
               size={20}
-              color={selectedShipping === "delivery" ? Theme.colors.accent : Theme.colors.grey[500]}
+              color={selectedMethod === "delivery" ? Theme.colors.accent : Theme.colors.grey[500]}
             />
           </TouchableOpacity>
         </View>

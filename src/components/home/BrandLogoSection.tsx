@@ -2,14 +2,8 @@ import { Images } from "@/src/constants/theme/images";
 import { Image, StyleSheet, View } from "react-native";
 
 export default function BrandLogoSection() {
-  const BRANDS = [
-    Images.home.brand.prada,
-    Images.home.brand.burberry,
-    Images.home.brand.boss,
-    Images.home.brand.cartier,
-    Images.home.brand.gucci,
-    Images.home.brand.tiffanyCo,
-  ];
+  const brandLogos = Object.values(Images.home.brand);
+
   return (
     <View style={styles.container}>
       <Image
@@ -18,7 +12,7 @@ export default function BrandLogoSection() {
         resizeMode="contain"
       />
       <View style={styles.logosContainer}>
-        {BRANDS.map((logo, index) => (
+        {brandLogos.map((logo, index) => (
           <View key={index} style={styles.logosWrapper}>
             <Image
               source={logo}

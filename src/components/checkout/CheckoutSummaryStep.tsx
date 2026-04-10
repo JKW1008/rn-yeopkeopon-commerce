@@ -1,7 +1,8 @@
 import { Theme } from "@/src/constants/theme";
 import { Images } from "@/src/constants/theme/images";
+import { CartItem } from "@/src/api/types";
 import React from "react";
-import CheckoutProductItem from "./CheckoutProductItem";
+import CheckoutProductItem from "@/src/components/checkout/CheckoutProductItem";
 import {
   Dimensions,
   Image,
@@ -17,16 +18,16 @@ import Animated, {
   FadeOutLeft,
   FadeOutRight,
 } from "react-native-reanimated";
-import TitleUnderline from "../common/TitleUnderline";
+import TitleUnderline from "@/src/components/common/TitleUnderline";
 
 import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
 interface CheckoutSummaryStepProps {
-  items: any[];
+  items: CartItem[];
   direction: "forward" | "backward";
-  onUpdateQuantity: (id: string, delta: number, size?: string) => void;
+  onUpdateQuantity: (id: string, delta: number, size?: string, color?: string) => void;
 }
 
 const CheckoutSummaryStep: React.FC<CheckoutSummaryStepProps> = ({

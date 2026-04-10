@@ -1,4 +1,5 @@
 import { Theme } from "@/src/constants/theme";
+import { scale, vs } from "@/src/utils/responsive";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
@@ -10,16 +11,15 @@ import {
   View,
 } from "react-native";
 
+import { Product } from "@/src/api/types";
+
 const { width } = Dimensions.get("window");
 
 interface CheckoutProductItemProps {
   item: {
     id: string;
-    name: string;
-    image: any;
-    price: number;
+    product: Product;
     quantity: number;
-    brand?: string;
     selectedSize?: string;
     selectedColor?: string;
   };
@@ -41,6 +41,8 @@ const CheckoutProductItem: React.FC<CheckoutProductItemProps> = ({
   onPress,
   showRemove = false,
 }) => {
+  const mainImage = item.product.images?.[0];
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -48,7 +50,7 @@ const CheckoutProductItem: React.FC<CheckoutProductItemProps> = ({
         onPress={onPress}
         activeOpacity={0.7}
       >
-        <Image source={item.image} style={styles.image} />
+        <Image source={{ uri: mainImage }} style={styles.image} />
       </TouchableOpacity>
       
       <View style={styles.itemInfo}>
@@ -58,7 +60,7 @@ const CheckoutProductItem: React.FC<CheckoutProductItemProps> = ({
             onPress={onPress}
             activeOpacity={0.7}
           >
-            <Text style={styles.brand}>{item.brand || "LAMEREI"}</Text>
+            <Text style={styles.brand}>{item.product.brand || "LAMEREI"}</Text>
           </TouchableOpacity>
           {showRemove && onRemove && (
             <TouchableOpacity
@@ -79,7 +81,7 @@ const CheckoutProductItem: React.FC<CheckoutProductItemProps> = ({
           onPress={onPress}
           activeOpacity={0.7}
         >
-          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.name}>{item.product.name}</Text>
         </TouchableOpacity>
 
         {(item.selectedSize || item.selectedColor) && (
@@ -121,7 +123,7 @@ const CheckoutProductItem: React.FC<CheckoutProductItemProps> = ({
         </View>
 
         <Text style={styles.price}>
-          ${(item.price * item.quantity).toLocaleString()}
+          ${(item.product.price * item.quantity).toLocaleString()}
         </Text>
       </View>
     </View>
@@ -131,20 +133,20 @@ const CheckoutProductItem: React.FC<CheckoutProductItemProps> = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    marginBottom: 25,
+    marginBottom: vs(25),
   },
   touchableArea: {
     flex: 0,
   },
   image: {
-    width: width * 0.3,
-    height: width * 0.4,
+    width: width * 0.28,
+    height: width * 0.38,
     backgroundColor: Theme.colors.surface,
   },
   itemInfo: {
     flex: 1,
-    paddingLeft: 20,
-    paddingVertical: 5,
+    paddingLeft: scale(20),
+    paddingVertical: vs(5),
     justifyContent: "space-between",
   },
   itemHeader: {
@@ -181,13 +183,13 @@ const styles = StyleSheet.create({
   qtyRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    marginBottom: 10,
+    gap: scale(8),
+    marginBottom: vs(10),
   },
   qtyBtn: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: scale(24),
+    height: scale(24),
+    borderRadius: scale(12),
     borderWidth: 1,
     borderColor: Theme.colors.grey[200],
     justifyContent: "center",
@@ -197,7 +199,7 @@ const styles = StyleSheet.create({
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.sm,
     color: Theme.colors.primary,
-    minWidth: 15,
+    minWidth: scale(15),
     textAlign: "center",
   },
   price: {

@@ -4,7 +4,7 @@ import Animated, { FadeInLeft, FadeInRight, FadeOutLeft, FadeOutRight } from 're
 import { Theme } from "@/src/constants/theme";
 import { Images } from "@/src/constants/theme/images";
 import FloatingLabelInput from "@/src/components/common/FloatingLabelInput";
-import { Address } from "@/src/hooks/useCheckout";
+import { Address } from "@/src/api/types";
 
 interface CheckoutEditAddressStepProps {
   tempAddress: Address;
@@ -43,18 +43,18 @@ const CheckoutEditAddressStep: React.FC<CheckoutEditAddressStepProps> = ({
             <View style={{ flex: 1 }}>
               <FloatingLabelInput
                 label="First name"
-                value={tempAddress.firstName}
+                value={tempAddress?.firstName || ""}
                 onChangeText={(text) =>
-                  onUpdateTempAddress({ firstName: text })
+                  onUpdateTempAddress && onUpdateTempAddress({ firstName: text })
                 }
               />
             </View>
             <View style={{ flex: 1, marginLeft: 15 }}>
               <FloatingLabelInput
                 label="Last name"
-                value={tempAddress.lastName}
+                value={tempAddress?.lastName || ""}
                 onChangeText={(text) =>
-                  onUpdateTempAddress({ lastName: text })
+                  onUpdateTempAddress && onUpdateTempAddress({ lastName: text })
                 }
               />
             </View>
@@ -62,17 +62,17 @@ const CheckoutEditAddressStep: React.FC<CheckoutEditAddressStepProps> = ({
 
           <FloatingLabelInput
             label="Address"
-            value={tempAddress.street}
+            value={tempAddress?.street || ""}
             onChangeText={(text) =>
-              onUpdateTempAddress({ street: text })
+              onUpdateTempAddress && onUpdateTempAddress({ street: text })
             }
           />
 
           <FloatingLabelInput
             label="City"
-            value={tempAddress.city}
+            value={tempAddress?.city || ""}
             onChangeText={(text) =>
-              onUpdateTempAddress({ city: text })
+              onUpdateTempAddress && onUpdateTempAddress({ city: text })
             }
           />
 
@@ -80,31 +80,34 @@ const CheckoutEditAddressStep: React.FC<CheckoutEditAddressStepProps> = ({
             <View style={{ flex: 1 }}>
               <FloatingLabelInput
                 label="State"
-                value={tempAddress.state}
+                value={tempAddress?.state || ""}
                 onChangeText={(text) =>
-                  onUpdateTempAddress({ state: text })
+                  onUpdateTempAddress && onUpdateTempAddress({ state: text })
                 }
               />
             </View>
             <View style={{ flex: 1, marginLeft: 15 }}>
               <FloatingLabelInput
                 label="ZIP code"
-                value={tempAddress.zipCode}
+                value={tempAddress?.zipCode || ""}
                 keyboardType="numeric"
-                onChangeText={(text) =>
-                  onUpdateTempAddress({ zipCode: text })
-                }
+                maxLength={5}
+                onChangeText={(text) => {
+                  const cleaned = text.replace(/[^0-9]/g, "");
+                  onUpdateTempAddress && onUpdateTempAddress({ zipCode: cleaned });
+                }}
               />
             </View>
           </View>
 
           <FloatingLabelInput
             label="Phone number"
-            value={tempAddress.phone}
+            value={tempAddress?.phone || ""}
             keyboardType="phone-pad"
-            onChangeText={(text) =>
-              onUpdateTempAddress({ phone: text })
-            }
+            onChangeText={(text) => {
+              const cleaned = text.replace(/[^0-9+\-() ]/g, "");
+              onUpdateTempAddress && onUpdateTempAddress({ phone: cleaned });
+            }}
           />
         </View>
       </ScrollView>

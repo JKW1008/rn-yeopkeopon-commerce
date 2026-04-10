@@ -1,6 +1,6 @@
 import { Theme } from "@/src/constants/theme";
 import { Images } from "@/src/constants/theme/images";
-import { Address } from "@/src/hooks/useCheckout";
+import { Address } from "@/src/api/types";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
@@ -106,7 +106,6 @@ const CheckoutAddressListStep: React.FC<CheckoutAddressListStepProps> = ({
             ))}
           </View>
 
-          {/* Moved inside ScrollView */}
           <View style={styles.addAddressInnerContainer}>
             <TouchableOpacity
               style={styles.addAddressBtn}

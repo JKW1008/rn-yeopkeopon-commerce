@@ -1,5 +1,5 @@
 import { Theme } from "@/src/constants/theme";
-import { Address } from "@/src/hooks/useCheckout";
+import { Address, PaymentMethod, CartItem } from "@/src/api/types";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, {
   FadeInLeft,
@@ -7,22 +7,24 @@ import Animated, {
   FadeOutLeft,
   FadeOutRight,
 } from "react-native-reanimated";
-import TitleUnderline from "../common/TitleUnderline";
-import CheckoutProductItem from "./CheckoutProductItem";
+import TitleUnderline from "@/src/components/common/TitleUnderline";
+import CheckoutProductItem from "@/src/components/checkout/CheckoutProductItem";
 
 import { useRouter } from "expo-router";
 
 interface CheckoutConfirmationStepProps {
-  items: any[];
+  items: CartItem[];
   selectedAddress: Address;
+  selectedPayment: PaymentMethod;
   selectedShipping: string;
   direction: "forward" | "backward";
-  onUpdateQuantity: (id: string, delta: number, size?: string) => void;
+  onUpdateQuantity: (id: string, delta: number, size?: string, color?: string) => void;
 }
 
 const CheckoutConfirmationStep: React.FC<CheckoutConfirmationStepProps> = ({
   items,
   selectedAddress,
+  selectedPayment,
   selectedShipping,
   direction,
   onUpdateQuantity,
@@ -85,7 +87,7 @@ const CheckoutConfirmationStep: React.FC<CheckoutConfirmationStepProps> = ({
                     />
                   </View>
                   <Text style={styles.paymentValue}>
-                    Master Card ending ••••89
+                    {selectedPayment.brand} ending ••••{selectedPayment.lastFour}
                   </Text>
                 </View>
               </View>

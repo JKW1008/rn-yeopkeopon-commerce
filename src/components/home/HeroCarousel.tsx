@@ -1,5 +1,5 @@
 import { Theme } from "@/src/constants/theme";
-import { BANNER_DATA } from "@/src/data/dummyCarusel";
+import { ms, scale, vs } from "@/src/utils/responsive";
 import { useRef, useState } from "react";
 import {
   Dimensions,
@@ -16,7 +16,13 @@ const { width } = Dimensions.get("window");
 const ITEM_WIDTH = width;
 const ITEM_HEIGHT = width * 1.6;
 
-export default function HeroCarousel() {
+interface Banner {
+  id: string;
+  image_url: string;
+  title: string;
+}
+
+export default function HeroCarousel({ data = [] }: { data: Banner[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const viewabilityConfig = { viewAreaCoveragePercentThreshold: 50 };
 
@@ -27,10 +33,11 @@ export default function HeroCarousel() {
       }
     },
   ).current;
+
   return (
     <View style={styles.container}>
       <FlatList
-        data={BANNER_DATA}
+        data={data}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
@@ -39,11 +46,13 @@ export default function HeroCarousel() {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.slide}>
-            <Image source={{ uri: item.image }} style={styles.image} />
+            <Image source={{ uri: item.image_url }} style={styles.image} />
 
             <View style={styles.overlay}>
               <View style={styles.textContainer}>
-                <Text style={styles.title}>{item.title}</Text>
+                <Text style={styles.title}>
+                  {item.title.replace(/\\n/g, "\n")}
+                </Text>
               </View>
             </View>
             <TouchableOpacity style={styles.button} activeOpacity={0.8}>
@@ -53,9 +62,8 @@ export default function HeroCarousel() {
         )}
       />
 
-      {/* 마름모 인디케이터 */}
       <View style={styles.indicatorContainer}>
-        {BANNER_DATA.map((_, index) => (
+        {data.map((_, index) => (
           <View
             key={index}
             style={[
@@ -95,25 +103,24 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: Theme.typography.fontFamily.boldHero,
-    fontSize: 48,
+    fontSize: ms(48),
     color: "rgba(0, 0, 0, 0.7)",
     textAlign: "left",
     alignSelf: "flex-start",
-    paddingHorizontal: 20,
-    fontStyle: "italic",
-    lineHeight: 62,
+    paddingHorizontal: scale(20),
+    lineHeight: vs(62),
     letterSpacing: -1,
-    marginBottom: 24,
+    marginBottom: vs(24),
     textTransform: "uppercase",
   },
   button: {
     backgroundColor: "rgba(50, 50, 50, 0.7)",
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 40,
+    paddingHorizontal: scale(24),
+    paddingVertical: vs(12),
+    borderRadius: scale(40),
     position: "absolute",
     alignSelf: "center",
-    bottom: 60,
+    bottom: vs(60),
   },
   buttonText: {
     fontFamily: Theme.typography.fontFamily.main,
@@ -123,14 +130,14 @@ const styles = StyleSheet.create({
   },
   indicatorContainer: {
     position: "absolute",
-    bottom: 25,
+    bottom: vs(25),
     flexDirection: "row",
     alignSelf: "center",
-    gap: 12,
+    gap: scale(12),
   },
   diamond: {
-    width: 8,
-    height: 8,
+    width: scale(8),
+    height: scale(8),
     transform: [{ rotate: "45deg" }],
   },
   diamondActive: {

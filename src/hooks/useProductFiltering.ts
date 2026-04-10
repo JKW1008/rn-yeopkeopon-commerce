@@ -1,4 +1,5 @@
-import { DUMMY_PRODUCTS, Product } from "@/src/data/dummyProductData";
+import { productService } from "../api/services/productService";
+import { Product } from "../api/types";
 import { useFilterStore } from "@/src/store/useFilterStore";
 import { useState, useMemo, useEffect } from "react";
 
@@ -32,9 +33,26 @@ export function useProductFiltering({
     toggleFilter,
   } = useFilterStore();
   const [currentPage, setCurrentPage] = useState(1);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // If we have a search query, we might want to reset category filters or handle them alongside
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      try {
+        const data = await productService.getProducts();
+        setProducts(data);
+      } catch {
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    if (isLoading) return;
+
     if (searchQuery) {
       setFilters(["All"]);
       setCurrentPage(1);
@@ -43,7 +61,7 @@ export function useProductFiltering({
 
     const filterFromParams = initialSubCategory || initialCategory || "All";
 
-    const hasData = DUMMY_PRODUCTS.some((p) => {
+    const hasData = products.some((p) => {
       if (filterFromParams === "All") return true;
       if (filterFromParams === "Apparel")
         return CATEGORY_MAP["Apparel"].includes(p.category);
@@ -55,7 +73,7 @@ export function useProductFiltering({
     const finalFilter = hasData ? filterFromParams : "All";
     setFilters([finalFilter]);
     setCurrentPage(1);
-  }, [initialCategory, initialSubCategory, searchQuery]);
+  }, [initialCategory, initialSubCategory, searchQuery, isLoading, products]);
 
   const handleFilterChange = (filter: string) => {
     toggleFilter(filter);
@@ -63,8 +81,7 @@ export function useProductFiltering({
   };
 
   const processedProducts = useMemo(() => {
-    let result = DUMMY_PRODUCTS.filter((p) => {
-      // 1. Filter by search query if it exists
+    let result = products.filter((p) => {
       if (searchQuery && searchQuery.trim()) {
         const lowerSearch = searchQuery.toLowerCase();
         const matchesSearch =
@@ -75,7 +92,6 @@ export function useProductFiltering({
         if (!matchesSearch) return false;
       }
 
-      // 2. Filter by active category filters
       if (activeFilters.includes("All") || activeFilters.length === 0)
         return true;
 
@@ -100,14 +116,14 @@ export function useProductFiltering({
     });
 
     return result;
-  }, [activeFilters, sortOption]);
+  }, [products, activeFilters, sortOption, searchQuery]);
 
   const totalPages = Math.ceil(processedProducts.length / PAGE_SIZE);
-  const startIndex = (currentPage - 1) * PAGE_SIZE;
-  const displayedProducts = processedProducts.slice(
-    startIndex,
-    startIndex + PAGE_SIZE,
-  );
+
+  const displayedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    return processedProducts.slice(startIndex, startIndex + PAGE_SIZE);
+  }, [processedProducts, currentPage]);
 
   return {
     sortOption,
@@ -119,5 +135,6 @@ export function useProductFiltering({
     setCurrentPage,
     totalPages,
     displayedProducts,
+    isLoading,
   };
 }

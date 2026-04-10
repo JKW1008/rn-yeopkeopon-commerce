@@ -68,9 +68,11 @@ export default function ToggleMenu() {
   const router = useRouter();
 
   const handleNavigate = (category: string, subCategory?: string) => {
-    setFilters([subCategory ?? category]);
     closeMenu();
-    router.push("/products");
+    router.push({
+      pathname: "/products",
+      params: { category, subCategory }
+    });
   };
 
   const {
@@ -100,7 +102,6 @@ export default function ToggleMenu() {
           </TouchableOpacity>
         </View>
 
-        {/* 탭 전체 영역 */}
         <View style={styles.tabWrapper}>
           <View style={styles.tabContainer}>
             {TABS.map((tab) => (

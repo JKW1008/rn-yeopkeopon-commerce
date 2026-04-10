@@ -1,30 +1,19 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { DUMMY_PRODUCTS, Product } from "@/src/data/dummyProductData";
 import { useRouter } from "expo-router";
+import { contentService } from "../api/services/contentService";
 
 const RECENT_SEARCH_KEY = "recent_searches";
 const MAX_RECENT_COUNT = 3;
-
-export const POPULAR_SEARCH_TERMS = [
-  "Trend",
-  "Dress",
-  "Bag",
-  "Tshirt",
-  "Beauty",
-  "Accessories",
-];
 
 export function useSearch() {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [popularTerms, setPopularTerms] = useState<Array<{ id: string; term: string; view_count: number }>>([]);
   const [isSearched, setIsSearched] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const PAGE_SIZE = 10;
-
-  // Load recent searches on mount
   useEffect(() => {
     const loadRecent = async () => {
       try {
@@ -32,14 +21,23 @@ export function useSearch() {
         if (stored) {
           setRecentSearches(JSON.parse(stored));
         }
-      } catch (e) {
-        console.error("Failed to load recent searches", e);
+      } catch {
       }
     };
     loadRecent();
   }, []);
 
-  // Save recent searches
+  useEffect(() => {
+    const fetchPopular = async () => {
+      try {
+        const terms = await contentService.getPopularSearches();
+        setPopularTerms(terms);
+      } catch {
+      }
+    };
+    fetchPopular();
+  }, []);
+
   const addRecentSearch = async (term: string) => {
     if (!term.trim()) return;
 
@@ -52,8 +50,7 @@ export function useSearch() {
     setRecentSearches(updated);
     try {
       await AsyncStorage.setItem(RECENT_SEARCH_KEY, JSON.stringify(updated));
-    } catch (e) {
-      console.error("Failed to save recent search", e);
+    } catch {
     }
   };
 
@@ -62,8 +59,7 @@ export function useSearch() {
     setRecentSearches(updated);
     try {
       await AsyncStorage.setItem(RECENT_SEARCH_KEY, JSON.stringify(updated));
-    } catch (e) {
-      console.error("Failed to remove recent search", e);
+    } catch {
     }
   };
 
@@ -92,6 +88,6 @@ export function useSearch() {
     addRecentSearch,
     removeRecentSearch,
     clearQuery,
-    popularTerms: POPULAR_SEARCH_TERMS,
+    popularTerms,
   };
 }

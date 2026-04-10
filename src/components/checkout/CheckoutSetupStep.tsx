@@ -1,6 +1,6 @@
 import { Theme } from "@/src/constants/theme";
 import { Images } from "@/src/constants/theme/images";
-import { Address, PaymentMethod } from "@/src/hooks/useCheckout";
+import { Address, PaymentMethod } from "@/src/api/types";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
 import {
@@ -32,7 +32,7 @@ const CheckoutSetupStep: React.FC<CheckoutSetupStepProps> = ({
   selectedPayment,
   selectedShipping,
   direction,
-  onChangeStep,
+  onChangeStep = () => {},
   onOpenShippingModal,
 }) => {
   return (
@@ -61,16 +61,16 @@ const CheckoutSetupStep: React.FC<CheckoutSetupStepProps> = ({
             </View>
             <TouchableOpacity
               style={styles.setupBox}
-              onPress={() => onChangeStep("address_list")}
+              onPress={() => onChangeStep && onChangeStep("address_list")}
             >
               <View style={styles.setupInfo}>
                 <Text style={styles.setupName}>
-                  {selectedAddress.firstName} {selectedAddress.lastName}
+                  {selectedAddress?.firstName} {selectedAddress?.lastName}
                 </Text>
-                <Text style={styles.setupText}>{selectedAddress.street}</Text>
+                <Text style={styles.setupText}>{selectedAddress?.street}</Text>
                 <Text style={styles.setupText}>
-                  {selectedAddress.city}, {selectedAddress.state}{" "}
-                  {selectedAddress.zipCode}
+                  {selectedAddress?.city}, {selectedAddress?.state}{" "}
+                  {selectedAddress?.zipCode}
                 </Text>
               </View>
               <Feather
@@ -87,12 +87,12 @@ const CheckoutSetupStep: React.FC<CheckoutSetupStepProps> = ({
             </View>
             <TouchableOpacity
               style={styles.setupBox}
-              onPress={() => onChangeStep("add_card")}
+              onPress={() => onChangeStep && onChangeStep("add_card")}
             >
               <View style={styles.setupInfo}>
-                <Text style={styles.setupName}>{selectedPayment.brand}</Text>
+                <Text style={styles.setupName}>{selectedPayment?.brand}</Text>
                 <Text style={styles.setupText}>
-                  Ending in {selectedPayment.number.slice(-4)}
+                  Ending in {selectedPayment?.lastFour}
                 </Text>
               </View>
               <Feather

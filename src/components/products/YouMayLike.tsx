@@ -1,10 +1,10 @@
 import { Theme } from "@/src/constants/theme";
 import { Images } from "@/src/constants/theme/images";
-import { DUMMY_PRODUCTS, Product } from "@/src/data/dummyProductData";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import ProductCard from "./ProductCard";
+import { useRecommendedProducts } from "@/src/hooks/useRecommendedProducts";
 
 interface YouMayLikeProps {
   currentProductId: string;
@@ -12,19 +12,14 @@ interface YouMayLikeProps {
 }
 
 export default function YouMayLike({ currentProductId, category }: YouMayLikeProps) {
-  const router = useRouter();
+  const { products, isLoading } = useRecommendedProducts(currentProductId, category);
 
-  // Filter products by category, excluding current product, take up to 4
-  const recommendedProducts = DUMMY_PRODUCTS.filter(
-    (p) => p.category === category && p.id !== currentProductId
-  ).slice(0, 4);
-
-  // If not enough products in same category, fill with others to make it 4
-  if (recommendedProducts.length < 4) {
-    const others = DUMMY_PRODUCTS.filter(
-      (p) => p.id !== currentProductId && !recommendedProducts.some(rp => rp.id === p.id)
-    ).slice(0, 4 - recommendedProducts.length);
-    recommendedProducts.push(...others);
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="small" color={Theme.colors.primary} />
+      </View>
+    );
   }
 
   return (
@@ -35,7 +30,7 @@ export default function YouMayLike({ currentProductId, category }: YouMayLikePro
       </View>
 
       <View style={styles.grid}>
-        {recommendedProducts.map((item) => (
+        {products.map((item) => (
           <ProductCard
             key={item.id}
             product={item}

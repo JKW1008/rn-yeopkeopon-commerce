@@ -1,4 +1,5 @@
 import { Theme } from "@/src/constants/theme";
+import { scale, vs } from "@/src/utils/responsive";
 import { Images } from "@/src/constants/theme/images";
 import React from "react";
 import {
@@ -13,19 +14,20 @@ import {
 } from "react-native";
 
 const { width } = Dimensions.get("window");
-const IMAGE_WIDTH = width - 40;
-const CAROUSEL_HEIGHT = 480;
+const IMAGE_WIDTH = width - scale(40);
 
 interface ProductImageCarouselProps {
   images: string[];
   activeIndex: number;
   onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  onResize?: () => void;
 }
 
 export default function ProductImageCarousel({
   images,
   activeIndex,
   onScroll,
+  onResize,
 }: ProductImageCarouselProps) {
   return (
     <View style={styles.carouselSection}>
@@ -33,7 +35,7 @@ export default function ProductImageCarousel({
         data={images}
         horizontal
         pagingEnabled={false}
-        snapToInterval={IMAGE_WIDTH + 10}
+        snapToInterval={IMAGE_WIDTH + scale(10)}
         decelerationRate="fast"
         showsHorizontalScrollIndicator={false}
         onScroll={onScroll}
@@ -46,7 +48,7 @@ export default function ProductImageCarousel({
               style={styles.mainImage}
               resizeMode="cover"
             />
-            <TouchableOpacity style={styles.zoomButton}>
+            <TouchableOpacity style={styles.zoomButton} onPress={onResize}>
               <Image
                 source={Images.productDetail.resize}
                 style={styles.zoomIcon}
@@ -74,16 +76,15 @@ export default function ProductImageCarousel({
 
 const styles = StyleSheet.create({
   carouselSection: {
-    paddingTop: 10,
-    marginBottom: 10,
+    paddingTop: vs(10),
+    marginBottom: vs(10),
   },
   carouselContainer: {
-    paddingHorizontal: 20,
-    gap: 10,
+    paddingHorizontal: scale(20),
+    gap: scale(10),
   },
   imageContainer: {
     width: IMAGE_WIDTH,
-    height: CAROUSEL_HEIGHT,
     aspectRatio: 0.8,
     position: "relative",
   },
@@ -93,30 +94,30 @@ const styles = StyleSheet.create({
   },
   zoomButton: {
     position: "absolute",
-    right: 15,
-    bottom: 15,
-    width: 36,
-    height: 36,
+    right: scale(15),
+    bottom: vs(15),
+    width: scale(36),
+    height: scale(36),
     backgroundColor: "rgba(0, 0, 0,0.3)",
-    borderRadius: 18,
+    borderRadius: scale(18),
     justifyContent: "center",
     alignItems: "center",
   },
   zoomIcon: {
-    width: 24,
-    height: 24,
+    width: scale(24),
+    height: scale(24),
     tintColor: Theme.colors.white,
   },
   indicatorContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 10,
-    gap: 10,
+    marginTop: vs(10),
+    gap: scale(10),
   },
   diamondIndicator: {
-    width: 6,
-    height: 6,
+    width: scale(6),
+    height: scale(6),
     borderWidth: 1,
     borderColor: Theme.colors.grey[300],
     transform: [{ rotate: "45deg" }],

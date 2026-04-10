@@ -1,4 +1,5 @@
 import { Theme } from "@/src/constants/theme";
+import { ms, scale, vs } from "@/src/utils/responsive";
 import { Images } from "@/src/constants/theme/images";
 import { Image, StyleSheet, Text, View } from "react-native";
 
@@ -62,7 +63,7 @@ export default function BrandStory() {
         <View style={styles.dividerWrapper}>
           <Image
             source={Images.home.titleUnderline}
-            style={{ width: 120, height: 15 }}
+            style={{ width: scale(120), height: vs(15) }}
             resizeMode="contain"
           />
         </View>
@@ -94,32 +95,32 @@ export default function BrandStory() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#fff",
-    paddingTop: 30,
+    paddingTop: vs(30),
     alignItems: "center",
   },
   trendingContainer: {
     alignItems: "center",
-    marginBottom: 40,
-    paddingHorizontal: 20,
+    marginBottom: vs(40),
+    paddingHorizontal: scale(20),
   },
   trendingTitle: {
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.h3,
     color: Theme.colors.primary,
     letterSpacing: Theme.typography.letterSpacing.luxury,
-    marginBottom: 24,
+    marginBottom: vs(24),
   },
   hashtagGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "flex-start",
-    gap: 10,
+    gap: scale(10),
   },
   hashtagBadge: {
     backgroundColor: Theme.colors.grey[50] || "#f8f8f8",
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 30,
+    paddingVertical: vs(10),
+    paddingHorizontal: scale(12),
+    borderRadius: scale(30),
   },
   hashtagText: {
     fontFamily: Theme.typography.fontFamily.main,
@@ -129,14 +130,14 @@ const styles = StyleSheet.create({
   storyContainer: {
     alignItems: "center",
     backgroundColor: Theme.colors.grey[100] || "#f3f3f3",
-    paddingTop: 30,
-    paddingHorizontal: 10,
+    paddingTop: vs(30),
+    paddingHorizontal: scale(10),
     width: "100%",
   },
   logo: {
-    width: 140,
-    height: 40,
-    marginBottom: 20,
+    width: scale(140),
+    height: vs(40),
+    marginBottom: vs(20),
     tintColor: Theme.colors.primary,
   },
   storyText: {
@@ -144,8 +145,8 @@ const styles = StyleSheet.create({
     fontSize: Theme.typography.fontSize.md,
     color: Theme.colors.secondary,
     textAlign: "center",
-    lineHeight: 24,
-    marginBottom: 10,
+    lineHeight: vs(24),
+    marginBottom: vs(10),
   },
   dividerWrapper: {
     alignItems: "center",
@@ -163,9 +164,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   featureIcon: {
-    width: 60,
-    height: 60,
-    marginBottom: 6,
+    width: scale(60),
+    height: scale(60),
+    marginBottom: vs(6),
     tintColor: Theme.colors.primary,
   },
   featureText: {
@@ -173,15 +174,15 @@ const styles = StyleSheet.create({
     fontSize: Theme.typography.fontSize.sm,
     color: Theme.colors.secondary,
     textAlign: "center",
-    lineHeight: 18,
+    lineHeight: vs(18),
   },
   penLineContainer: {
     backgroundColor: Theme.colors.grey[100],
-    paddingTop: 10,
+    paddingTop: vs(10),
     alignItems: "center",
   },
   penLine: {
-    width: 80,
+    width: scale(80),
     tintColor: Theme.colors.primary,
   },
 });

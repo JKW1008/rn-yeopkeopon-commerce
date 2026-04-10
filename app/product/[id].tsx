@@ -3,6 +3,7 @@ import ProductAccordionDetails from "@/src/components/products/ProductAccordionD
 import ProductBottomBar from "@/src/components/products/ProductBottomBar";
 import ProductControls from "@/src/components/products/ProductControls";
 import ProductImageCarousel from "@/src/components/products/ProductImageCarousel";
+import ProductFullscreenViewer from "@/src/components/products/ProductFullscreenViewer";
 import ProductInfo from "@/src/components/products/ProductInfo";
 import ShareProductModal from "@/src/components/products/ShareProductModal";
 import YouMayLike from "@/src/components/products/YouMayLike";
@@ -10,9 +11,9 @@ import AppFooter from "@/src/components/ui/AppFooter";
 import AppHeader from "@/src/components/ui/AppHeader";
 import { Theme } from "@/src/constants/theme";
 import { Images } from "@/src/constants/theme/images";
-import { DUMMY_PRODUCTS } from "@/src/data/dummyProductData";
-import { useAddToCart } from "@/src/hooks/useAddToCart";
+import { useProductDetail } from "@/src/hooks/useProductDetail";
 import { useProductWishlist } from "@/src/hooks/useProductWishlist";
+import { useCartStore } from "@/src/store/useCartStore";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -25,6 +26,7 @@ import {
   Text,
   UIManager,
   View,
+  ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -38,12 +40,6 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const MOCK_COLORS = [
-  { id: "c1", hex: "#000000", name: "Black" },
-  { id: "c2", hex: "#777777", name: "Grey" },
-  { id: "c3", hex: "#C4C4C4", name: "Light Grey" },
-];
-
 const SHIPPING_ITEMS = [
   {
     id: "0",
@@ -55,26 +51,40 @@ const SHIPPING_ITEMS = [
     id: "1",
     icon: Images.productDetail.tag,
     title: "COD Policy",
-    content:
-      "Cash on Delivery is available for all domestic orders. Please check with your carrier for details.",
+    content: "Cash on Delivery is available for all domestic orders.",
   },
   {
     id: "2",
     icon: Images.productDetail.refresh,
     title: "Return Policy",
-    content:
-      "Returns accepted within 30 days. Exchange available for all items.",
+    content: "Returns accepted within 30 days.",
   },
 ];
-
-import { useCartStore } from "@/src/store/useCartStore";
 
 export default function ProductDetailScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
-  const product = DUMMY_PRODUCTS.find((p) => p.id === id);
   const openCart = useCartStore((state) => state.openCart);
+
+  const {
+    product,
+    isLoading,
+    selectedSize,
+    setSelectedSize,
+    selectedColor,
+    setSelectedColor,
+    handleAddToCart,
+  } = useProductDetail(id as string);
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [showSizeModal, setShowSizeModal] = useState(false);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [openShippingSection, setOpenShippingSection] = useState<string | null>(null);
+
+  const { isLiked, handleToggleLike } = useProductWishlist(id as string);
 
   const handleBack = () => {
     router.back();
@@ -83,29 +93,19 @@ export default function ProductDetailScreen() {
     }
   };
 
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const [selectedColor, setSelectedColor] = useState(MOCK_COLORS[0].id);
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [showSizeModal, setShowSizeModal] = useState(false);
-  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
-  const [openShippingSection, setOpenShippingSection] = useState<string | null>(
-    null,
-  );
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const scrollOffset = event.nativeEvent.contentOffset.x;
+    const index = Math.round(scrollOffset / IMAGE_WIDTH);
+    setActiveIndex(index);
+  };
 
-  const { isLiked, handleToggleLike } = useProductWishlist(product?.id ?? "");
-  const { handleAddToBasket } = useAddToCart(
-    product,
-    selectedSize,
-    MOCK_COLORS.find((c) => c.id === selectedColor)?.name || null,
-    () => setShowSizeModal(true),
-  );
-
-  const isJewelry = product
-    ? ["Ring", "Necklace"].includes(product.category)
-    : false;
-  const isShoes = product ? product.category === "Shoes" : false;
-  const sizeLabel = "Size";
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.center]}>
+        <ActivityIndicator size="large" color={Theme.colors.primary} />
+      </View>
+    );
+  }
 
   if (!product) {
     return (
@@ -118,30 +118,21 @@ export default function ProductDetailScreen() {
     );
   }
 
-  const productImages = [product.imageUrl, product.imageUrl, product.imageUrl];
-
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const scrollOffset = event.nativeEvent.contentOffset.x;
-    const index = Math.round(scrollOffset / IMAGE_WIDTH);
-    setActiveIndex(index);
-  };
+  const isJewelry = ["Ring", "Necklace", "Jewelry"].includes(product.category);
+  const isShoes = product.category === "Shoes";
 
   return (
     <View style={styles.container}>
-      <View
-        style={{ paddingTop: insets.top, backgroundColor: Theme.colors.white }}
-      >
+      <View style={{ paddingTop: insets.top, backgroundColor: Theme.colors.white }}>
         <AppHeader showBack={true} onBack={handleBack} />
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <ProductImageCarousel
-          images={productImages}
+          images={product.images}
           activeIndex={activeIndex}
           onScroll={handleScroll}
+          onResize={() => setIsFullscreen(true)}
         />
 
         <ProductInfo
@@ -154,25 +145,25 @@ export default function ProductDetailScreen() {
         <ProductControls
           isJewelry={isJewelry}
           isShoes={isShoes}
-          colors={MOCK_COLORS}
+          colors={product.options.colors.map((c, i) => ({ id: `c${i}`, ...c }))}
           selectedColor={selectedColor}
           setSelectedColor={setSelectedColor}
-          sizes={product.sizes}
+          sizes={product.options.sizes}
           selectedSize={selectedSize}
           setSelectedSize={setSelectedSize}
-          sizeLabel={sizeLabel}
+          sizeLabel="Size"
           onOpenSizeModal={() => setShowSizeModal(true)}
         />
 
         <ProductBottomBar
-          onAddToBasket={handleAddToBasket}
+          onAddToBasket={handleAddToCart}
           onToggleLike={handleToggleLike}
           isLiked={isLiked}
         />
 
         <ProductAccordionDetails
           description={product.description}
-          imageUrl={product.imageUrl}
+          imageUrl={product.images[0]}
           isGalleryOpen={isGalleryOpen}
           setIsGalleryOpen={setIsGalleryOpen}
           openShippingSection={openShippingSection}
@@ -186,9 +177,9 @@ export default function ProductDetailScreen() {
 
       <SizeSelectModal
         visible={showSizeModal}
-        sizes={product.sizes}
+        sizes={product.options.sizes}
         selectedSize={selectedSize}
-        label={sizeLabel}
+        label="Size"
         onSelect={setSelectedSize}
         onClose={() => setShowSizeModal(false)}
       />
@@ -197,6 +188,12 @@ export default function ProductDetailScreen() {
         visible={showShareModal}
         productId={product.id}
         onClose={() => setShowShareModal(false)}
+      />
+
+      <ProductFullscreenViewer
+        visible={isFullscreen}
+        images={product.images}
+        onClose={() => setIsFullscreen(false)}
       />
     </View>
   );

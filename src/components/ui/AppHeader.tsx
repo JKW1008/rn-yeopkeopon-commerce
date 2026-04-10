@@ -1,4 +1,5 @@
 import { Theme } from "@/src/constants/theme";
+import { scale, vs } from "@/src/utils/responsive";
 import { Images } from "@/src/constants/theme/images";
 import { useCartStore } from "@/src/store/useCartStore";
 import { useMenuStore } from "@/src/store/useMenuStore";
@@ -85,11 +86,11 @@ export default function AppHeader({
 
 const styles = StyleSheet.create({
   container: {
-    height: 60,
+    height: vs(60),
     backgroundColor: Theme.colors.white,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: scale(20),
   },
   sideArea: {
     flex: 1,
@@ -97,15 +98,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoImage: {
-    width: 100,
-    height: 40,
+    width: scale(100),
+    height: vs(40),
   },
   headerIcons: {
-    width: 24,
-    height: 24,
+    width: scale(24),
+    height: scale(24),
   },
   rightActions: {
     flexDirection: "row",
-    gap: 16,
+    gap: scale(16),
   },
 });

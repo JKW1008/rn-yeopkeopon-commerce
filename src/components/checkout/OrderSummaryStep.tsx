@@ -108,7 +108,10 @@ const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
                 onPress={() => handleProductPress(item.id)}
                 activeOpacity={0.7}
               >
-                <Image source={item.image} style={styles.summaryImage} />
+                <Image 
+                  source={typeof item.image === 'string' ? { uri: item.image } : item.image} 
+                  style={styles.summaryImage} 
+                />
                 <View style={styles.itemInfo}>
                   <Text style={styles.confirmItemBrand}>
                     {item.brand || item.subTitle || "21WN"}
@@ -118,7 +121,7 @@ const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
                     style={[styles.qtyRow, { borderWidth: 0, paddingLeft: 0 }]}
                   >
                     <Text style={[styles.qtyText, { marginLeft: 0 }]}>
-                      {`Qty: ${item.quantity}`}
+                      {`Qty: ${item.quantity || 1}`}
                       {item.selectedSize ? ` / Size: ${item.selectedSize}` : ""}
                       {item.selectedColor
                         ? ` / Color: ${item.selectedColor}`
@@ -126,7 +129,7 @@ const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
                     </Text>
                   </View>
                   <Text style={styles.itemPrice}>
-                    ${(item.price * item.quantity).toLocaleString()}
+                    ${((item.price || 0) * (item.quantity || 1)).toLocaleString()}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -155,7 +158,6 @@ const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
   );
 };
 
-// Simplified Styles for OrderSummaryStep - Need to ensure consistency with main screen
 const styles = StyleSheet.create({
   scrollContent: {
     paddingTop: 30,
@@ -295,7 +297,7 @@ const styles = StyleSheet.create({
   homeBtnTextFull: {
     color: Theme.colors.white,
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: Theme.typography.fontSize.lg,
+    fontSize: Theme.typography.fontSize.h4,
     letterSpacing: Theme.typography.letterSpacing.wider,
   },
 });

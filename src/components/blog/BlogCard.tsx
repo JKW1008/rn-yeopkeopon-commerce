@@ -1,5 +1,5 @@
 import { Theme } from "@/src/constants/theme";
-import { BlogPost } from "@/src/data/dummyBlogData";
+import { BlogPost } from "@/src/api/types";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
@@ -12,9 +12,8 @@ interface BlogCardProps {
 }
 
 function getRelativeDate(dateString: string) {
-  const [year, month, day] = dateString.split(".").map(Number);
-  const postDate = new Date(year, month - 1, day);
-  const today = new Date(2026, 3, 8);
+  const postDate = new Date(dateString);
+  const today = new Date();
 
   const diffTime = today.getTime() - postDate.getTime();
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
@@ -31,7 +30,7 @@ function getRelativeDate(dateString: string) {
   return `${diffYears} ${diffYears === 1 ? "year" : "years"} ago`;
 }
 
-export default function BlogCard({ post, viewMode = "large" }: BlogCardProps) {
+const BlogCard = React.memo(function BlogCard({ post, viewMode = "large" }: BlogCardProps) {
   const router = useRouter();
   const [isSaved, setIsSaved] = useState(false);
 
@@ -113,7 +112,9 @@ export default function BlogCard({ post, viewMode = "large" }: BlogCardProps) {
       </View>
     </TouchableOpacity>
   );
-}
+});
+
+export default BlogCard;
 
 const styles = StyleSheet.create({
   container: {

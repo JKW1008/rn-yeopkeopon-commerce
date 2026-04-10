@@ -1,4 +1,5 @@
 import { Theme } from "@/src/constants/theme";
+import { scale, vs } from "@/src/utils/responsive";
 import { Images } from "@/src/constants/theme/images";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -36,7 +37,7 @@ export default function AppFooter() {
 
       <Image
         source={Images.home.titleUnderline}
-        style={{ width: 150, height: 15 }}
+        style={{ width: scale(150), height: vs(15) }}
         resizeMode="contain"
       />
 
@@ -48,7 +49,7 @@ export default function AppFooter() {
 
       <Image
         source={Images.home.titleUnderline}
-        style={{ width: 150, height: 15 }}
+        style={{ width: scale(150), height: vs(15) }}
         resizeMode="contain"
       />
 
@@ -77,16 +78,16 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: Theme.colors.white,
     alignItems: "center",
-    paddingTop: 40,
+    paddingTop: vs(40),
   },
   socialContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 40,
-    marginBottom: 20,
+    gap: scale(40),
+    marginBottom: vs(20),
   },
   iconButton: {
-    padding: 8,
+    padding: scale(8),
   },
   dividerWrapper: {
     flexDirection: "row",
@@ -106,8 +107,8 @@ const styles = StyleSheet.create({
   },
   contactContainer: {
     alignItems: "center",
-    marginVertical: 20,
-    gap: 12,
+    marginVertical: vs(20),
+    gap: vs(12),
   },
   contactText: {
     fontFamily: Theme.typography.fontFamily.main,
@@ -117,8 +118,8 @@ const styles = StyleSheet.create({
   },
   linksContainer: {
     flexDirection: "row",
-    gap: 50,
-    marginVertical: 40,
+    gap: scale(50),
+    marginVertical: vs(40),
   },
   linkText: {
     fontFamily: Theme.typography.fontFamily.main,
@@ -129,7 +130,7 @@ const styles = StyleSheet.create({
     backgroundColor: Theme.colors.grey[100],
     width: "100%",
     alignItems: "center",
-    paddingVertical: 15,
+    paddingVertical: vs(15),
   },
   copyrightText: {
     fontFamily: Theme.typography.fontFamily.main,

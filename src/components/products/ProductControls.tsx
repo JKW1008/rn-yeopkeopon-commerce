@@ -45,9 +45,9 @@ const ProductControls: React.FC<ProductControlsProps> = ({
                 key={color.id}
                 style={[
                   styles.colorCircleOuter,
-                  selectedColor === color.id && styles.colorCircleActive,
+                  selectedColor === color.name && styles.colorCircleActive,
                 ]}
-                onPress={() => setSelectedColor(color.id)}
+                onPress={() => setSelectedColor(color.name)}
               >
                 <View
                   style={[
@@ -130,9 +130,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   colorCircleOuter: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     borderWidth: 1,
     borderColor: "transparent",
     justifyContent: "center",
@@ -142,9 +142,9 @@ const styles = StyleSheet.create({
     borderColor: Theme.colors.grey[500],
   },
   colorCircleInner: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
   },
   sizeSection: {
     flexDirection: "row",
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   },
   sizeButtonText: {
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: Theme.typography.fontSize.md,
+    fontSize: Theme.typography.fontSize.sm,
     color: Theme.colors.primary,
   },
   activeSizeButtonText: {

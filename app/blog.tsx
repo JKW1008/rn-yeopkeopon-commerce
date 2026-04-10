@@ -15,9 +15,10 @@ import TitleUnderline from "@/src/components/common/TitleUnderline";
 import AppFooter from "@/src/components/ui/AppFooter";
 import AppHeader from "@/src/components/ui/AppHeader";
 import { Theme } from "@/src/constants/theme";
-import { BLOG_CATEGORIES } from "@/src/data/dummyBlogData";
 import { useBlogPostFiltering } from "@/src/hooks/useBlogPostFiltering";
 import { Ionicons } from "@expo/vector-icons";
+
+const BLOG_CATEGORIES = ["All", "Fashion", "Lifestyle", "Beauty", "Trends"];
 
 export default function BlogScreen() {
   const [viewMode, setViewMode] = useState<"large" | "small">("large");

@@ -1,12 +1,21 @@
 import { Theme } from "@/src/constants/theme";
+import { ms, scale, vs } from "@/src/utils/responsive";
 import { Images } from "@/src/constants/theme/images";
 import {
   Image,
+  Platform,
   StyleSheet,
   Text,
   View,
   useWindowDimensions,
 } from "react-native";
+
+interface Collection {
+  id: string;
+  name: string;
+  image_url: string;
+  description?: string;
+}
 
 export default function Collections() {
   const { width } = useWindowDimensions();
@@ -24,7 +33,7 @@ export default function Collections() {
             style={styles.firstImage}
             resizeMode="contain"
           />
-          <Text style={styles.bigNumber}>10</Text>
+          <Text style={styles.bigNumber}>{"10 "}</Text>
           <Text style={styles.monthText}>October</Text>
           <Text style={styles.overlayText}>COLLECTION</Text>
         </View>
@@ -39,6 +48,8 @@ export default function Collections() {
         <Text style={styles.seasonText}>Autumn</Text>
         <Text style={styles.seasonOverlay}>COLLECTION</Text>
       </View>
+
+
 
       <View style={styles.videoSection}>
         <Image
@@ -57,14 +68,14 @@ export default function Collections() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#fff",
-    marginTop: 10,
-    marginBottom: 50,
+    marginTop: vs(10),
+    marginBottom: vs(50),
     width: "100%",
   },
   titleContainer: {
     width: "100%",
     alignItems: "center",
-    marginTop: 20,
+    marginTop: vs(20),
     marginBottom: 0,
   },
   titleText: {
@@ -82,30 +93,38 @@ const styles = StyleSheet.create({
   firstImage: {
     width: "100%",
     aspectRatio: 0.6,
-    marginTop: -180,
+    marginTop: -vs(180),
   },
   bigNumber: {
     position: "absolute",
-    right: 20,
+    ...Platform.select({
+      ios: {
+        right: scale(8),
+        paddingRight: scale(20),
+      },
+      android: {
+        right: -scale(25),
+        paddingRight: scale(40),
+      },
+    }),
     bottom: "36%",
-    fontSize: 180,
+    fontSize: ms(180, 0.3),
     fontFamily: Theme.typography.fontFamily.boldHero,
     color: "rgba(0, 0, 0, 0.4)",
-    fontStyle: "italic",
-    paddingRight: 30,
-    letterSpacing: -25,
+    letterSpacing: -scale(25),
+    includeFontPadding: false,
   },
   monthText: {
     position: "absolute",
-    right: 10,
+    right: scale(10),
     bottom: "58%",
-    fontSize: 48,
+    fontSize: ms(48, 0.3),
     fontFamily: Theme.typography.fontFamily.boldHero,
     color: "#FFFFFF",
   },
   overlayText: {
     position: "absolute",
-    right: 20,
+    right: scale(20),
     bottom: "58%",
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.md,
@@ -116,22 +135,22 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: 50,
-    paddingBottom: 50,
-    marginTop: -220,
+    paddingTop: vs(50),
+    paddingBottom: vs(50),
+    marginTop: -vs(220),
   },
   seasonText: {
     position: "absolute",
-    right: 90,
+    right: scale(90),
     bottom: "84%",
-    fontSize: 48,
+    fontSize: ms(48, 0.3),
     fontFamily: Theme.typography.fontFamily.boldHero,
     color: "rgba(0, 0, 0, 0.5)",
     letterSpacing: -4,
   },
   seasonOverlay: {
     position: "absolute",
-    right: 90,
+    right: scale(90),
     bottom: "82%",
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.md,
@@ -140,7 +159,7 @@ const styles = StyleSheet.create({
   },
   videoSection: {
     width: "100%",
-    height: 200,
+    height: vs(200),
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
@@ -151,16 +170,16 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   playButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: scale(50),
+    height: scale(50),
+    borderRadius: scale(25),
     backgroundColor: "rgba(0, 0, 0, 0.4)",
     justifyContent: "center",
     alignItems: "center",
   },
   playIcon: {
     color: "#FFFFFF",
-    fontSize: 28,
-    marginLeft: 5,
+    fontSize: ms(28),
+    marginLeft: scale(5),
   },
 });
