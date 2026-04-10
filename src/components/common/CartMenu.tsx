@@ -25,8 +25,9 @@ export default function CartMenu() {
     items,
     updateQuantity,
     removeItem,
-    getTotalPrice,
   } = useCartStore();
+
+  const totalPrice = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
@@ -139,7 +140,7 @@ export default function CartMenu() {
                 <Text style={styles.totalLabel}>SUB TOTAL</Text>
                 <Text
                   style={styles.totalAmount}
-                >{`$${getTotalPrice().toLocaleString()}`}</Text>
+                >{`$${totalPrice.toLocaleString()}`}</Text>
               </View>
               <View style={styles.shippingDescription}>
                 <Text style={styles.shippingDescriptionText}>
