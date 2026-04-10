@@ -147,3 +147,14 @@ expo-env.d.ts
 .expo/
 .expo-shared/
 *.swp
+
+# AI & IDE Metadata
+.claude/
+.idea/
+.vscode/
+.antigravity/
+.claude/
+*.iml
+*.ipr
+*.iws
+.DS_Store
