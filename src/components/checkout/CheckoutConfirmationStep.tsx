@@ -115,7 +115,7 @@ const CheckoutConfirmationStep: React.FC<CheckoutConfirmationStepProps> = ({
                 key={`${item.id}-${item.selectedSize}-${item.selectedColor}`}
                 item={item}
                 onUpdateQuantity={onUpdateQuantity}
-                onPress={() => handleProductPress(item.id)}
+                onPress={() => handleProductPress(item.productId)}
               />
             ))}
           </View>

@@ -65,6 +65,13 @@ export const useCartStore = create<CartState>((set, get) => ({
     if (!item) return;
 
     const newQuantity = Math.max(1, item.quantity + delta);
+
+    set((state) => ({
+      items: state.items.map((i) =>
+        i.id === id ? { ...i, quantity: newQuantity } : i
+      ),
+    }));
+
     try {
       await orderService.upsertCartItem({
         productId: item.productId,
@@ -72,12 +79,12 @@ export const useCartStore = create<CartState>((set, get) => ({
         selectedSize: item.selectedSize,
         selectedColor: item.selectedColor,
       });
+    } catch {
       set((state) => ({
         items: state.items.map((i) =>
-          i.id === id ? { ...i, quantity: newQuantity } : i
+          i.id === id ? { ...i, quantity: item.quantity } : i
         ),
       }));
-    } catch (error) {
     }
   },
 

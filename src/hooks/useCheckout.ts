@@ -294,8 +294,9 @@ export const useCheckout = () => {
 
       changeStep("success");
       await clearCart();
-    } catch {
-      Alert.alert("ORDER ERROR", "Failed to place order. Please try again.");
+    } catch (e: any) {
+      const msg = e?.message || e?.error_description || JSON.stringify(e);
+      Alert.alert("ORDER ERROR", msg);
     } finally {
       setIsOrdering(false);
     }
