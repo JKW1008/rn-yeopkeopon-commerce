@@ -63,17 +63,19 @@ export const orderService = {
   async createOrder(order: {
     totalAmount: number;
     addressId?: string;
+    addressSnapshot?: object;
     paymentMethodId?: string;
     items: any[];
   }) {
     const userId = await getDeviceUserId();
-    
+
     const { data: orderData, error: orderError } = await supabase
       .from("orders")
       .insert({
         user_id: userId,
         total_amount: order.totalAmount,
         address_id: order.addressId,
+        shipping_address: order.addressSnapshot ?? null,
         payment_method_id: order.paymentMethodId,
         status: "created"
       })

@@ -267,6 +267,7 @@ export const useCheckout = () => {
       const orderResult = await orderService.createOrder({
         totalAmount: finalPrice,
         addressId: selectedAddress?.id,
+        addressSnapshot: selectedAddress ?? undefined,
         paymentMethodId: selectedPayment?.id,
         items: items.map(item => ({
           productId: item.productId,
