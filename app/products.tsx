@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
@@ -9,7 +9,7 @@ import ProductCard from "@/src/components/products/ProductCard";
 import { Theme } from "@/src/constants/theme";
 import { useViewStore } from "@/src/store/useViewStore";
 import { useProductFiltering } from "@/src/hooks/useProductFiltering";
-import { Product } from "@/src/data/dummyProductData";
+import { Product } from "@/src/api/types";
 import Pagination from "@/src/components/common/Pagination";
 import SearchResultHeader from "@/src/components/search/SearchResultHeader";
 
@@ -37,11 +37,12 @@ export default function ProductsScreen() {
     searchQuery: params.search,
   });
 
-  const renderItem = ({ item }: { item: Product }) => (
-    <ProductCard product={item} variant={viewMode} />
+  const renderItem = useCallback(
+    ({ item }: { item: Product }) => <ProductCard product={item} variant={viewMode} />,
+    [viewMode]
   );
 
-  const ItemSeparator = () => <View style={{ height: 20 }} />;
+  const ItemSeparator = useCallback(() => <View style={{ height: 20 }} />, []);
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
@@ -111,38 +112,6 @@ const styles = StyleSheet.create({
   },
   columnWrapper: {
     justifyContent: "space-between",
-  },
-  paginationContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 40,
-    gap: 15,
-  },
-  pageNumbers: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  pageButton: {
-    width: 35,
-    height: 35,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: Theme.colors.grey[100],
-  },
-  activePageButton: {
-    backgroundColor: Theme.colors.primary,
-  },
-  pageText: {
-    fontFamily: Theme.typography.fontFamily.main,
-    fontSize: Theme.typography.fontSize.base,
-    color: Theme.colors.secondary,
-  },
-  activePageText: {
-    color: Theme.colors.white,
-  },
-  pageArrow: {
-    padding: 10,
   },
   emptyContainer: {
     padding: 100,

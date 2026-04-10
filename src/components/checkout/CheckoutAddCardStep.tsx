@@ -1,6 +1,6 @@
 import FloatingLabelInput from "@/src/components/common/FloatingLabelInput";
 import { Theme } from "@/src/constants/theme";
-import { PaymentMethod } from "@/src/hooks/useCheckout";
+import { PaymentMethod } from "@/src/api/types";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
 import {
@@ -18,7 +18,7 @@ import Animated, {
   FadeOutLeft,
   FadeOutRight,
 } from "react-native-reanimated";
-import TitleUnderline from "../common/TitleUnderline";
+import TitleUnderline from "@/src/components/common/TitleUnderline";
 
 const { width } = Dimensions.get("window");
 
@@ -28,10 +28,10 @@ interface CheckoutAddCardStepProps {
   card: { name: string; number: string; expiry: string; cvv: string };
   activeCardIndex: number;
   direction: "forward" | "backward";
-  onUpdateCard: (updates: any) => void;
-  onSetActiveCardIndex: (index: number) => void;
-  onNext: () => void;
-  buttonText: string;
+  setCard: (updates: any) => void;
+  onCardChange: (index: number) => void;
+  onNext?: () => void;
+  buttonText?: string;
 }
 
 const CheckoutAddCardStep: React.FC<CheckoutAddCardStepProps> = ({
@@ -40,8 +40,8 @@ const CheckoutAddCardStep: React.FC<CheckoutAddCardStepProps> = ({
   card,
   activeCardIndex,
   direction,
-  onUpdateCard,
-  onSetActiveCardIndex,
+  setCard,
+  onCardChange,
   onNext,
   buttonText,
 }) => {
@@ -56,7 +56,7 @@ const CheckoutAddCardStep: React.FC<CheckoutAddCardStepProps> = ({
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.titleContainer}>
-          <Text style={styles.pageTitle}>CHECKOUT</Text>
+          <Text style={styles.pageTitle}>PAYMENT METHOD</Text>
           <TitleUnderline />
         </View>
 
@@ -75,7 +75,7 @@ const CheckoutAddCardStep: React.FC<CheckoutAddCardStepProps> = ({
             const index = Math.round(
               e.nativeEvent.contentOffset.x / snapInterval,
             );
-            onSetActiveCardIndex(index);
+            onCardChange(index);
           }}
           contentContainerStyle={{
             paddingLeft: (width - width * 0.8) / 2,
@@ -119,8 +119,8 @@ const CheckoutAddCardStep: React.FC<CheckoutAddCardStepProps> = ({
                 <Text style={styles.cardPreviewName}>
                   {pm.id === selectedPaymentId ? "Iris Watson" : "Name on Card"}
                 </Text>
-                <Text style={styles.cardPreviewNumber}>{pm.number}</Text>
-                <Text style={styles.cardPreviewExpiry}>03/25</Text>
+                <Text style={styles.cardPreviewNumber}>•••• •••• •••• {pm.lastFour}</Text>
+                <Text style={styles.cardPreviewExpiry}>{pm.expiryDate}</Text>
               </View>
             </View>
           ))}
@@ -160,7 +160,7 @@ const CheckoutAddCardStep: React.FC<CheckoutAddCardStepProps> = ({
           <FloatingLabelInput
             label="Name On Card"
             value={card.name}
-            onChangeText={(text) => onUpdateCard({ name: text })}
+            onChangeText={(text) => setCard({ name: text })}
           />
 
           <FloatingLabelInput
@@ -173,7 +173,7 @@ const CheckoutAddCardStep: React.FC<CheckoutAddCardStepProps> = ({
                 .replace(/\D/g, "")
                 .replace(/(.{4})/g, "$1 ")
                 .trim();
-              onUpdateCard({ number: formatted });
+              setCard({ number: formatted });
             }}
           />
 
@@ -186,7 +186,7 @@ const CheckoutAddCardStep: React.FC<CheckoutAddCardStepProps> = ({
                 maxLength={2}
                 onChangeText={(text) => {
                   const parts = card.expiry.split("/");
-                  onUpdateCard({ expiry: `${text}/${parts[1] || ""}` });
+                  setCard({ expiry: `${text}/${parts[1] || ""}` });
                 }}
               />
             </View>
@@ -198,7 +198,7 @@ const CheckoutAddCardStep: React.FC<CheckoutAddCardStepProps> = ({
                 maxLength={2}
                 onChangeText={(text) => {
                   const parts = card.expiry.split("/");
-                  onUpdateCard({ expiry: `${parts[0] || ""}/${text}` });
+                  setCard({ expiry: `${parts[0] || ""}/${text}` });
                 }}
               />
             </View>
@@ -210,7 +210,7 @@ const CheckoutAddCardStep: React.FC<CheckoutAddCardStepProps> = ({
             keyboardType="numeric"
             maxLength={3}
             secureTextEntry
-            onChangeText={(text) => onUpdateCard({ cvv: text })}
+            onChangeText={(text) => setCard({ cvv: text })}
           />
         </View>
       </ScrollView>

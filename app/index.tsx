@@ -1,3 +1,9 @@
+import { Theme } from "@/src/constants/theme";
+import { useHomeData } from "@/src/hooks/useHomeData";
+import React from "react";
+import { RefreshControl, ScrollView, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import BrandLogoSection from "@/src/components/home/BrandLogoSection";
 import BrandStory from "@/src/components/home/BrandStory";
 import Collections from "@/src/components/home/Collections";
@@ -6,28 +12,35 @@ import HeroCarousel from "@/src/components/home/HeroCarousel";
 import SnsSection from "@/src/components/home/SnsSection";
 import AppFooter from "@/src/components/ui/AppFooter";
 import AppHeader from "@/src/components/ui/AppHeader";
-import { Theme } from "@/src/constants/theme";
-import { DUMMY_PRODUCTS } from "@/src/data/dummyProductData";
-import { ScrollView, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import HomeProductSection from "../src/components/home/HomeProductSection";
 
 export default function HomeScreen() {
+  const {
+    banners,
+    newArrivals,
+    forYouProducts,
+    snsPosts,
+    isRefreshing,
+    onRefresh,
+  } = useHomeData();
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <ScrollView
         style={styles.scrollArea}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+        }
       >
         <AppHeader />
-        <HeroCarousel />
-        <HomeProductSection products={DUMMY_PRODUCTS} />
+        <HeroCarousel data={banners} />
+        <HomeProductSection />
         <BrandLogoSection />
         <Collections />
-        <ForYou />
+        <ForYou data={forYouProducts} />
         <BrandStory />
-        <SnsSection />
+        <SnsSection data={snsPosts} />
         <AppFooter />
       </ScrollView>
     </SafeAreaView>

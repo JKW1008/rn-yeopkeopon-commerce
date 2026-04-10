@@ -132,7 +132,6 @@ export default function ProductHeader({
         </ScrollView>
       )}
 
-      {/* Sort Modal */}
       <Modal
         visible={showSortModal}
         transparent
@@ -176,7 +175,6 @@ export default function ProductHeader({
         </TouchableOpacity>
       </Modal>
 
-      {/* Filter Bottom Sheet */}
       <Modal
         visible={showFilterModal}
         transparent

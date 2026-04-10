@@ -1,5 +1,6 @@
 import { Theme } from "@/src/constants/theme";
-import { Product } from "@/src/data/dummyProductData";
+import { scale, vs } from "@/src/utils/responsive";
+import { Product } from "@/src/api/types";
 import { useProductWishlist } from "@/src/hooks/useProductWishlist";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -20,7 +21,7 @@ interface ProductCardProps {
   variant: "grid" | "list" | "large";
 }
 
-export default function ProductCard({ product, variant }: ProductCardProps) {
+const ProductCard = React.memo(function ProductCard({ product, variant }: ProductCardProps) {
   const router = useRouter();
   const { isLiked, handleToggleLike } = useProductWishlist(product.id);
 
@@ -28,13 +29,16 @@ export default function ProductCard({ product, variant }: ProductCardProps) {
     router.push(`/product/${product.id}`);
   };
 
+  const mainImage = product.images?.[0];
+
   if (variant === "list") {
-    const isApparel = ["Outer", "Dress", "Knitwear"].includes(product.category);
+    const isApparel = ["Outer", "Dress", "Knitwear", "Apparel"].includes(product.category);
+    const sizes = product.options?.sizes || [];
 
     return (
       <TouchableOpacity style={styles.listContainer} onPress={handlePress}>
         <View style={styles.listImageWrapper}>
-          <Image source={{ uri: product.imageUrl }} style={styles.listImage} />
+          <Image source={{ uri: mainImage }} style={styles.listImage} />
           <TouchableOpacity
             style={[styles.imageHeartButton, styles.listHeartButton]}
             onPress={handleToggleLike}
@@ -53,22 +57,22 @@ export default function ProductCard({ product, variant }: ProductCardProps) {
           </Text>
 
           <View style={styles.listMetaColumn}>
-            <Text style={styles.priceText}>{`$${product.price}`}</Text>
+            <Text style={styles.priceText}>{`$${product.price.toLocaleString()}`}</Text>
 
             <View style={styles.listRatingRow}>
               <Ionicons name="star" size={14} color={Theme.colors.accent} />
               <Text style={styles.listRatingText}>
-                {product.rating} Ratings
+                {product.rating}
               </Text>
             </View>
 
-            {isApparel && product.sizes && product.sizes.length > 0 && (
+            {isApparel && sizes.length > 0 && (
               <View style={styles.listSizesGroup}>
                 <View style={styles.sizeLabelContainer}>
                   <Text style={styles.sizeLabelText}>Size</Text>
                 </View>
                 <View style={styles.listSizesRow}>
-                  {product.sizes.slice(0, 3).map((size) => (
+                  {sizes.slice(0, 3).map((size) => (
                     <View key={size} style={styles.listSizeChip}>
                       <Text style={styles.listSizeText}>{size}</Text>
                     </View>
@@ -86,7 +90,7 @@ export default function ProductCard({ product, variant }: ProductCardProps) {
     return (
       <TouchableOpacity style={styles.largeContainer} onPress={handlePress}>
         <View style={styles.imageWrapper}>
-          <Image source={{ uri: product.imageUrl }} style={styles.largeImage} />
+          <Image source={{ uri: mainImage }} style={styles.largeImage} />
           <TouchableOpacity
             style={styles.imageHeartButton}
             onPress={handleToggleLike}
@@ -101,17 +105,16 @@ export default function ProductCard({ product, variant }: ProductCardProps) {
         <View style={styles.largeFooter}>
           <Text style={styles.brandText}>{product.brand}</Text>
           <Text style={styles.largeNameText}>{product.name}</Text>
-          <Text style={styles.priceText}>{`$${product.price}`}</Text>
+          <Text style={styles.priceText}>{`$${product.price.toLocaleString()}`}</Text>
         </View>
       </TouchableOpacity>
     );
   }
 
-  // Default Grid View
   return (
     <TouchableOpacity style={styles.gridContainer} onPress={handlePress}>
       <View style={styles.imageWrapper}>
-        <Image source={{ uri: product.imageUrl }} style={styles.gridImage} />
+        <Image source={{ uri: mainImage }} style={styles.gridImage} />
         <TouchableOpacity
           style={styles.imageHeartButton}
           onPress={handleToggleLike}
@@ -128,14 +131,15 @@ export default function ProductCard({ product, variant }: ProductCardProps) {
         <Text style={styles.nameText} numberOfLines={2}>
           {product.name}
         </Text>
-        <Text style={styles.priceText}>{`$${product.price}`}</Text>
+        <Text style={styles.priceText}>{`$${product.price.toLocaleString()}`}</Text>
       </View>
     </TouchableOpacity>
   );
-}
+});
+
+export default ProductCard;
 
 const styles = StyleSheet.create({
-  // Common Styles
   brandText: {
     fontFamily: Theme.typography.fontFamily.main,
     fontSize: Theme.typography.fontSize.md,
@@ -176,17 +180,16 @@ const styles = StyleSheet.create({
     color: Theme.colors.grey[500],
     marginBottom: 4,
   },
-  // Grid Styles
   gridContainer: {
     width: "48%",
   },
   gridImage: {
     width: "100%",
-    height: 220,
+    height: vs(220),
     backgroundColor: Theme.colors.grey[100],
   },
   gridFooter: {
-    paddingVertical: 10,
+    paddingVertical: vs(10),
   },
   listBrandText: {
     fontFamily: Theme.typography.fontFamily.main,
@@ -252,14 +255,13 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
 
-  // List Styles
   listContainer: {
     flexDirection: "row",
     backgroundColor: Theme.colors.white,
   },
   listImageWrapper: {
-    width: width * 0.3,
-    height: width * 0.4,
+    width: width * 0.28,
+    height: width * 0.38,
     position: "relative",
   },
   listImage: {
@@ -269,8 +271,8 @@ const styles = StyleSheet.create({
   },
   listInfo: {
     flex: 1,
-    paddingLeft: 18,
-    paddingVertical: 12, // 상단부터 균일하게 시작하도록 패딩 추가
+    paddingLeft: scale(18),
+    paddingVertical: vs(12),
     justifyContent: "flex-start",
   },
   listHeaderSection: {
@@ -346,7 +348,6 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
 
-  // Large Styles
   largeContainer: {
     width: "100%",
   },

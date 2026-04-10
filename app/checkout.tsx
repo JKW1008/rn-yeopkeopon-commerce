@@ -2,12 +2,11 @@ import AppHeader from "@/src/components/ui/AppHeader";
 import { Theme } from "@/src/constants/theme";
 import { Images } from "@/src/constants/theme/images";
 import { useCheckout } from "@/src/hooks/useCheckout";
-import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCartStore } from "@/src/store/useCartStore";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import {
   ActivityIndicator,
-  Alert,
   Image,
   StyleSheet,
   Text,
@@ -40,7 +39,7 @@ export default function CheckoutScreen() {
   const insets = useSafeAreaInsets();
   const { from } = useLocalSearchParams<{ from?: string }>();
   const openCart = useCartStore((state) => state.openCart);
-  
+
   const {
     currentStep,
     changeStep,
@@ -62,13 +61,12 @@ export default function CheckoutScreen() {
     setEditingAddressId,
     paymentMethods,
     selectedPaymentId,
-    setSelectedPaymentId,
     card,
-    setCard,
+    updateCard,
     tempAddress,
-    setTempAddress,
+    updateTempAddress,
     activeCardIndex,
-    setActiveCardIndex,
+    onActiveCardChange,
     handleBack,
     handleNext,
     total,
@@ -98,17 +96,18 @@ export default function CheckoutScreen() {
       case "edit_address":
         return editingAddressId ? "UPDATE ADDRESS" : "ADD ADDRESS";
       case "address_list":
-        return "CONTINUE";
+        return "SELECT ADDRESS";
       case "add_card":
-        return "ADD CARD";
+        return activeCardIndex < paymentMethods.length
+          ? "SELECT PAYMENT"
+          : "ADD CARD";
       default:
         return "CONTINUE";
     }
   };
 
   const showFooter =
-    currentStep !== "success" &&
-    currentStep !== "order_summary";
+    currentStep !== "success" && currentStep !== "order_summary";
 
   const progress = useSharedValue(0);
 
@@ -129,6 +128,7 @@ export default function CheckoutScreen() {
 
   React.useEffect(() => {
     progress.value = withSpring(getProgress());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep]);
 
   const progressStyle = useAnimatedStyle(() => ({
@@ -137,27 +137,20 @@ export default function CheckoutScreen() {
 
   return (
     <View style={styles.container}>
-      {currentStep !== "success" &&
-        currentStep !== "order_summary" && (
-          <View style={{ paddingTop: insets.top }}>
-            <AppHeader
-              showBack={true}
-              onBack={customHandleBack}
-            />
-            <View style={styles.progressBarContainer}>
-              <Animated.View style={[styles.progressBar, progressStyle]} />
-            </View>
+      {currentStep !== "success" && currentStep !== "order_summary" && (
+        <View style={{ paddingTop: insets.top }}>
+          <AppHeader showBack={true} onBack={customHandleBack} />
+          <View style={styles.progressBarContainer}>
+            <Animated.View style={[styles.progressBar, progressStyle]} />
           </View>
-        )}
+        </View>
+      )}
 
       {currentStep === "summary" && (
         <CheckoutSummaryStep
           items={items}
-          total={total}
           onUpdateQuantity={updateQuantity}
           direction={direction}
-          selectedShipping={selectedShipping}
-          onOpenShippingModal={() => setIsShippingModalVisible(true)}
         />
       )}
 
@@ -165,7 +158,9 @@ export default function CheckoutScreen() {
         <CheckoutSetupStep
           selectedAddress={selectedAddress}
           selectedPayment={selectedPayment}
-          onStepChange={changeStep}
+          selectedShipping={selectedShipping}
+          onChangeStep={changeStep}
+          onOpenShippingModal={() => setIsShippingModalVisible(true)}
           direction={direction}
         />
       )}
@@ -173,7 +168,7 @@ export default function CheckoutScreen() {
       {currentStep === "address_list" && (
         <CheckoutAddressListStep
           addresses={addresses}
-          selectedAddressId={selectedAddressId}
+          selectedAddressId={selectedAddressId ?? ""}
           direction={direction}
           onSelectAddress={setSelectedAddressId}
           onEditAddress={(id) => {
@@ -191,7 +186,7 @@ export default function CheckoutScreen() {
         <CheckoutEditAddressStep
           tempAddress={tempAddress}
           direction={direction}
-          onUpdateTempAddress={setTempAddress}
+          onUpdateTempAddress={updateTempAddress}
           onNext={handleNext}
         />
       )}
@@ -199,18 +194,20 @@ export default function CheckoutScreen() {
       {currentStep === "add_card" && (
         <CheckoutAddCardStep
           card={card}
-          setCard={setCard}
+          setCard={updateCard}
           direction={direction}
           paymentMethods={paymentMethods}
+          selectedPaymentId={selectedPaymentId ?? ""}
           activeCardIndex={activeCardIndex}
-          onCardChange={setActiveCardIndex}
+          onCardChange={onActiveCardChange}
+          onNext={handleNext}
+          buttonText={getButtonText()}
         />
       )}
 
       {currentStep === "confirmation" && (
         <CheckoutConfirmationStep
           items={items}
-          total={total}
           selectedAddress={selectedAddress}
           selectedPayment={selectedPayment}
           direction={direction}
@@ -221,14 +218,20 @@ export default function CheckoutScreen() {
 
       {showFooter && (
         <View style={styles.footer}>
-          <View style={styles.priceContainer}>
-            <Text style={styles.totalLabel}>
-              {currentStep === "summary" ? "EST. TOTAL" : "TOTAL"}
-            </Text>
-            <Text style={styles.totalValue}>
-              ${(selectedShipping === "delivery" ? total + 15 : total).toLocaleString()}
-            </Text>
-          </View>
+          {currentStep !== "address_list" && currentStep !== "add_card" && (
+            <View style={styles.priceContainer}>
+              <Text style={styles.totalLabel}>
+                {currentStep === "summary" ? "EST. TOTAL" : "TOTAL"}
+              </Text>
+              <Text style={styles.totalValue}>
+                $
+                {(selectedShipping === "delivery"
+                  ? total + 15
+                  : total
+                ).toLocaleString()}
+              </Text>
+            </View>
+          )}
           <View style={{ backgroundColor: Theme.colors.primary }}>
             <AnimatedTouchableOpacity
               onPress={handleNext}
@@ -242,11 +245,14 @@ export default function CheckoutScreen() {
               {isOrdering ? (
                 <ActivityIndicator color={Theme.colors.white} />
               ) : (
-                <Image
-                  source={Images.header.shoppingBag}
-                  style={styles.btnIcon}
-                  tintColor={Theme.colors.white}
-                />
+                currentStep !== "address_list" &&
+                currentStep !== "add_card" && (
+                  <Image
+                    source={Images.header.shoppingBag}
+                    style={styles.btnIcon}
+                    tintColor={Theme.colors.white}
+                  />
+                )
               )}
               <Text style={styles.checkoutBtnText}>
                 {isOrdering ? "PROCESSING..." : getButtonText()}
@@ -347,7 +353,7 @@ const styles = StyleSheet.create({
   checkoutBtnText: {
     color: Theme.colors.white,
     fontFamily: Theme.typography.fontFamily.main,
-    fontSize: Theme.typography.fontSize.lg,
+    fontSize: Theme.typography.fontSize.h4,
     letterSpacing: Theme.typography.letterSpacing.wider,
   },
 });

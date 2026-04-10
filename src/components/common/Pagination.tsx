@@ -16,26 +16,38 @@ export default function Pagination({
 }: PaginationProps) {
   if (totalPages <= 1) return null;
 
-  const pages = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pages.push(i);
-  }
+  const getVisiblePages = () => {
+    const half = 2;
+    let start = Math.max(currentPage - half, 1);
+    let end = Math.min(start + 4, totalPages);
+
+    if (end === totalPages) {
+      start = Math.max(end - 4, 1);
+    }
+
+    const pages = [];
+    for (let i = start; i <= end; i++) {
+        pages.push(i);
+    }
+    return pages;
+  };
+
+  const pages = getVisiblePages();
 
   return (
     <View style={styles.paginationContainer}>
-      <TouchableOpacity
-        style={styles.pageArrow}
-        disabled={currentPage === 1}
-        onPress={() => onPageChange(Math.max(1, currentPage - 1))}
-      >
-        <Ionicons
-          name="chevron-back"
-          size={20}
-          color={
-            currentPage === 1 ? Theme.colors.grey[300] : Theme.colors.primary
-          }
-        />
-      </TouchableOpacity>
+      {currentPage > 1 && (
+        <TouchableOpacity
+          style={styles.pageArrow}
+          onPress={() => onPageChange(Math.max(1, currentPage - 1))}
+        >
+          <Ionicons
+            name="chevron-back"
+            size={20}
+            color={Theme.colors.primary}
+          />
+        </TouchableOpacity>
+      )}
 
       <View style={styles.pageNumbers}>
         {pages.map((p) => (
@@ -59,21 +71,18 @@ export default function Pagination({
         ))}
       </View>
 
-      <TouchableOpacity
-        style={styles.pageArrow}
-        disabled={currentPage === totalPages}
-        onPress={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-      >
-        <Ionicons
-          name="chevron-forward"
-          size={20}
-          color={
-            currentPage === totalPages
-              ? Theme.colors.grey[300]
-              : Theme.colors.primary
-          }
-        />
-      </TouchableOpacity>
+      {currentPage < totalPages && (
+        <TouchableOpacity
+          style={styles.pageArrow}
+          onPress={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+        >
+          <Ionicons
+            name="chevron-forward"
+            size={20}
+            color={Theme.colors.primary}
+          />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -85,6 +94,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginVertical: 40,
     gap: 15,
+    width: "100%",
   },
   pageNumbers: {
     flexDirection: "row",
@@ -95,10 +105,13 @@ const styles = StyleSheet.create({
     height: 35,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Theme.colors.grey[100],
+    backgroundColor: Theme.colors.grey[50],
+    borderWidth: 1,
+    borderColor: Theme.colors.grey[100],
   },
   activePageButton: {
     backgroundColor: Theme.colors.primary,
+    borderColor: Theme.colors.primary,
   },
   pageText: {
     fontFamily: Theme.typography.fontFamily.main,
@@ -110,5 +123,7 @@ const styles = StyleSheet.create({
   },
   pageArrow: {
     padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

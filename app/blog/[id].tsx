@@ -1,7 +1,8 @@
 import { Theme } from "@/src/constants/theme";
-import { DUMMY_BLOG_POSTS } from "@/src/data/dummyBlogData";
+import { supabaseService } from "@/src/api/supabaseService";
+import { DbBlogPost } from "@/src/types/database";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   ScrollView,
@@ -13,6 +14,7 @@ import {
   FlatList,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AppHeader from "@/src/components/ui/AppHeader";
@@ -24,20 +26,19 @@ export default function BlogDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [post, setPost] = useState<DbBlogPost | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const blogId = Array.isArray(id) ? id[0] : id;
-  const post = DUMMY_BLOG_POSTS.find((p) => p.id === blogId);
 
-  if (!post) {
-    return (
-      <SafeAreaView style={styles.errorContainer}>
-        <Text style={styles.errorText}>{`Post not found`}</Text>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.backLink}>{`Go Back`}</Text>
-        </TouchableOpacity>
-      </SafeAreaView>
-    );
-  }
+  useEffect(() => {
+    if (!blogId) return;
+    supabaseService.getBlogPostDetail(blogId)
+      .then(setPost)
+      .catch(() => setError("Post not found"))
+      .finally(() => setLoading(false));
+  }, [blogId]);
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const slideSize = event.nativeEvent.layoutMeasurement.width;
@@ -45,19 +46,18 @@ export default function BlogDetailScreen() {
     setActiveImageIndex(Math.round(index));
   };
 
-  const renderRichText = (text: string) => {
+  const renderRichText = useCallback((text: string) => {
     const highlights = ["Saint Laurent canvas handbag", "Fendi bucket bag", "DeMellier off white bag"];
-    let parts = [text];
+    let parts: (string | React.ReactElement)[] = [text];
 
     highlights.forEach(highlight => {
-      let nextParts: string[] = [];
+      let nextParts: (string | React.ReactElement)[] = [];
       parts.forEach(part => {
         if (typeof part === "string") {
           const splitPart = part.split(highlight);
           for (let i = 0; i < splitPart.length; i++) {
             nextParts.push(splitPart[i]);
             if (i < splitPart.length - 1) {
-              // @ts-ignore
               nextParts.push(<Text key={`${highlight}-${i}`} style={styles.highlight}>{highlight}</Text>);
             }
           }
@@ -65,24 +65,44 @@ export default function BlogDetailScreen() {
           nextParts.push(part);
         }
       });
-      // @ts-ignore
       parts = nextParts;
     });
 
     return parts;
-  };
+  }, []);
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.errorContainer}>
+        <ActivityIndicator size="large" color={Theme.colors.primary} />
+      </SafeAreaView>
+    );
+  }
+
+  if (error || !post) {
+    return (
+      <SafeAreaView style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error ?? "Post not found"}</Text>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Text style={styles.backLink}>{`Go Back`}</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
+
+  const sections = post.blog_sections ?? [];
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <AppHeader showBack={true} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.articleBody}>
-          <Image source={{ uri: post.imageUrl }} style={styles.mainImage} />
-          
+          <Image source={{ uri: post.image_url ?? undefined }} style={styles.mainImage} />
+
           <View style={styles.contentSection}>
             <Text style={styles.title}>{post.title.toUpperCase()}</Text>
-            
-            {post.sections.map((section, index) => {
+
+            {sections.map((section, index) => {
               if (section.type === "image") {
                 if (section.images && section.images.length > 1) {
                   return (
@@ -100,12 +120,12 @@ export default function BlogDetailScreen() {
                       />
                       <View style={styles.pagination}>
                         {section.images.map((_, i) => (
-                          <View 
-                            key={i} 
+                          <View
+                            key={i}
                             style={[
-                              styles.dot, 
+                              styles.dot,
                               activeImageIndex === i && styles.activeDot
-                            ]} 
+                            ]}
                           />
                         ))}
                       </View>
@@ -113,22 +133,22 @@ export default function BlogDetailScreen() {
                   );
                 }
                 return (
-                  <Image 
-                    key={`img-${index}`} 
-                    source={{ uri: section.value }} 
-                    style={styles.sectionImage} 
+                  <Image
+                    key={`img-${index}`}
+                    source={{ uri: section.value ?? undefined }}
+                    style={styles.sectionImage}
                   />
                 );
               }
               return (
                 <Text key={`txt-${index}`} style={styles.sectionText}>
-                  {renderRichText(section.value)}
+                  {renderRichText(section.value ?? "")}
                 </Text>
               );
             })}
 
             <View style={styles.articleFooter}>
-              <Text style={styles.postedBy}>{`Posted by OpenFashion | ${post.updatedAt}`}</Text>
+              <Text style={styles.postedBy}>{`Posted by OpenFashion | ${post.updated_at}`}</Text>
               <View style={styles.footerTags}>
                 {post.tags.map((tag, index) => (
                   <View key={index} style={styles.tagPill}>
@@ -180,7 +200,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   highlight: {
-    color: "#DD8560", // Screenshot highlight color
+    color: "#DD8560",
   },
   sectionImage: {
     width: width - 40,

@@ -1,6 +1,6 @@
 import { Theme } from "@/src/constants/theme";
+import { scale, vs } from "@/src/utils/responsive";
 import { Images } from "@/src/constants/theme/images";
-import { DUMMY_PRODUCTS } from "@/src/data/dummyProductData";
 import { useRef, useState } from "react";
 import {
   Dimensions,
@@ -13,11 +13,12 @@ import {
 } from "react-native";
 import ProductCard from "../products/ProductCard";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const CARD_WIDTH = SCREEN_WIDTH * 0.75;
+import { Product } from "@/src/api/types";
 
-export default function ForYou() {
-  const carouselData = DUMMY_PRODUCTS.slice(4, 9);
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const CARD_WIDTH = SCREEN_WIDTH * 0.72;
+
+export default function ForYou({ data = [] }: { data: Product[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const viewabilityConfig = { viewAreaCoveragePercentThreshold: 50 };
@@ -36,13 +37,13 @@ export default function ForYou() {
         <Text style={styles.titleText}>JUST FOR YOU</Text>
         <Image
           source={Images.home.titleUnderline}
-          style={{ width: 150, height: 15 }}
+          style={{ width: scale(150), height: vs(15) }}
           resizeMode="contain"
         />
       </View>
 
       <FlatList
-        data={carouselData}
+        data={data}
         keyExtractor={(item) => item.id}
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -58,7 +59,7 @@ export default function ForYou() {
         )}
       />
       <View style={styles.indicatorContainer}>
-        {carouselData.map((_, index) => (
+        {data.map((_, index) => (
           <View
             key={index}
             style={[
@@ -77,13 +78,13 @@ export default function ForYou() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#fff",
-    marginTop: 10,
-    marginBottom: 50,
+    marginTop: vs(10),
+    marginBottom: vs(50),
   },
   titleContainer: {
     alignItems: "center",
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: vs(20),
+    marginBottom: vs(20),
   },
   titleText: {
     fontFamily: Theme.typography.fontFamily.main,
@@ -92,9 +93,9 @@ const styles = StyleSheet.create({
     color: Theme.colors.primary,
   },
   carouselContainer: {
-    marginTop: 8,
-    paddingHorizontal: 16,
-    gap: 16,
+    marginTop: vs(8),
+    paddingHorizontal: scale(16),
+    gap: scale(16),
   },
   cardWrapper: {
     width: CARD_WIDTH,
@@ -102,11 +103,11 @@ const styles = StyleSheet.create({
   indicatorContainer: {
     flexDirection: "row",
     alignSelf: "center",
-    gap: 12,
+    gap: scale(12),
   },
   diamond: {
-    width: 8,
-    height: 8,
+    width: scale(8),
+    height: scale(8),
     transform: [{ rotate: "45deg" }],
   },
   diamondActive: {

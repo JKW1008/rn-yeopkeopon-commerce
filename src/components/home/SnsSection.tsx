@@ -9,16 +9,20 @@ import {
   useWindowDimensions,
 } from "react-native";
 
-const PROFILES = [
-  { id: 1, image: Images.home.profile.mia1, text: "@mia" },
-  { id: 2, image: Images.home.profile.jihyn1, text: "@_jihyn" },
-  { id: 3, image: Images.home.profile.mia2, text: "@mia" },
-  { id: 4, image: Images.home.profile.jihyn2, text: "@_jihyn" },
+import { SnsPost } from "@/src/api/types";
+
+const PROFILES_FALLBACK = [
+  { id: "1", image_url: Images.home.profile.mia1, username: "@mia" },
+  { id: "2", image_url: Images.home.profile.jihyn1, username: "@_jihyn" },
+  { id: "3", image_url: Images.home.profile.mia2, username: "@mia" },
+  { id: "4", image_url: Images.home.profile.jihyn2, username: "@_jihyn" },
 ];
 
-export default function SnsSection() {
+export default function SnsSection({ data = [] }: { data: SnsPost[] }) {
   const { width } = useWindowDimensions();
   const ITEM_SIZE = (width - 50) / 2;
+
+  const displayPosts = data.length > 0 ? data : PROFILES_FALLBACK;
 
   return (
     <View style={styles.container}>
@@ -31,13 +35,13 @@ export default function SnsSection() {
         />
       </View>
       <View style={styles.profileGrid}>
-        {PROFILES.map((profile) => (
+        {displayPosts.map((profile) => (
           <View
             key={profile.id}
             style={[styles.profileItem, { width: ITEM_SIZE, marginBottom: 16 }]}
           >
             <Image
-              source={profile.image}
+              source={typeof profile.image_url === "string" ? { uri: profile.image_url } : profile.image_url}
               style={{ width: ITEM_SIZE, height: ITEM_SIZE }}
               resizeMode="cover"
             />
@@ -45,7 +49,7 @@ export default function SnsSection() {
               colors={["transparent", "rgba(0,0,0,0.8)"]}
               style={styles.gradientOverlay}
             />
-            <Text style={styles.profileText}>{profile.text}</Text>
+            <Text style={styles.profileText}>{profile.username}</Text>
           </View>
         ))}
       </View>

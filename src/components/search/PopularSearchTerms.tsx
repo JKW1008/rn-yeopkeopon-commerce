@@ -3,7 +3,7 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface PopularSearchTermsProps {
-  terms: string[];
+  terms: Array<{ id: string; term: string; view_count: number }>;
   onSelect: (term: string) => void;
 }
 
@@ -15,13 +15,13 @@ export default function PopularSearchTerms({
     <View style={styles.container}>
       <Text style={styles.title}>Popular search terms</Text>
       <View style={styles.list}>
-        {terms.map((term, index) => (
+        {terms.map((item) => (
           <TouchableOpacity
-            key={index}
+            key={item.id}
             style={styles.termButton}
-            onPress={() => onSelect(term)}
+            onPress={() => onSelect(item.term)}
           >
-            <Text style={styles.termText}>{term}</Text>
+            <Text style={styles.termText}>{item.term}</Text>
           </TouchableOpacity>
         ))}
       </View>

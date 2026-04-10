@@ -1,5 +1,5 @@
 import { Theme } from "@/src/constants/theme/index";
-import { Product } from "@/src/types/database";
+import { Product } from "@/src/data/dummyProductData";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface ProductCardProps {
@@ -17,10 +17,7 @@ export default function ProductCard({ product, onPress, isLarge = false }: Produ
     >
       <Image
         source={{
-          uri:
-            product.images && product.images.length > 0
-              ? product.images[0]
-              : "https://via.placeholder.com/300x400",
+          uri: product.imageUrl || "https://via.placeholder.com/300x400",
         }}
         style={styles.image}
       />
